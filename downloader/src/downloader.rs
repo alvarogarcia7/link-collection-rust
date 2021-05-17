@@ -7,7 +7,7 @@ pub struct NodeView {
     pub by: String,
     time: u64,
     pub title: String,
-    pub url: String,
+    pub url: Option<String>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -49,6 +49,8 @@ impl FirebaseHackerNewsDownloader {
                 error.url().unwrap().as_str()
             );
             return Err(error);
+        } else {
+            println!("Downloaded OK from url = {:?}", response.url().to_string());
         }
         response.json::<NodeView>().map(|node_view| ResponseView {
             node_view,
@@ -70,7 +72,7 @@ pub mod tests {
     use crate::downloader::{FirebaseHackerNewsDownloader, NodeView, ResponseView};
 
     #[test]
-    fn fetch_and_parse_the_fields() {
+    fn fetch_and_parse_the_fields_with_url() {
         let downloader = FirebaseHackerNewsDownloader::new("http://0.0.0.0:8181".to_string());
 
         let response = downloader.get_item(12339182329);
@@ -83,9 +85,31 @@ pub mod tests {
                 by: "vanusa".to_string(),
                 time: 1621276965,
                 title: "Why Is the Gaza Strip Blurry on Google Maps?".to_string(),
-                url: "https://www.bbc.com/news/57102499".to_string(),
+                url: Some("https://www.bbc.com/news/57102499".to_string()),
             },
             origin: "https://news.ycombinator.com/item?id=12339182329".to_string(),
+        };
+
+        assert_eq!(response.unwrap(), expected);
+    }
+    #[test]
+    fn fetch_and_parse_the_fields_without_url() {
+        let downloader = FirebaseHackerNewsDownloader::new("http://0.0.0.0:8181".to_string());
+
+        let response = downloader.get_item(40500429);
+
+        assert!(response.is_ok());
+
+        let expected = ResponseView {
+            node_view: NodeView {
+                id: 40500429,
+                by: "gooob".to_string(),
+                time: 1716902002,
+                title: "Ask HN: Why Are People Not Including Url on a Self-Submitted Story?"
+                    .to_string(),
+                url: None,
+            },
+            origin: "https://news.ycombinator.com/item?id=40500429".to_string(),
         };
 
         assert_eq!(response.unwrap(), expected);
@@ -105,7 +129,7 @@ pub mod date_tests {
             // GMT: Monday, May 17, 2021 6:42:45 PM
             time: 1621276965,
             title: "".to_string(),
-            url: "".to_string(),
+            url: Some("".to_string()),
         };
 
         assert_eq!(view.time, 1621276965);
