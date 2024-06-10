@@ -1,3 +1,5 @@
+pub mod recutils_database;
+
 #[cfg(test)]
 pub mod tests {
     use rrecutils::{Recfile, Record};

@@ -5,6 +5,11 @@ use core::str;
 use clap::builder::Str;
 use clap::{arg, Command};
 
+use data_access::recutils_database::RecutilsDatabaseAccess;
+
+use crate::commands::list_command;
+
+mod commands;
 mod common;
 
 #[derive(PartialEq, Copy, Clone)]
@@ -88,7 +93,11 @@ fn cli() -> Command {
         .subcommand(
             Command::new(SubcommandType::LIST)
                 .about("Reads a file")
-                .arg(arg!(<FILE> "The database file to read"))
+                .arg(
+                    arg!(<FILE> "The database file to read")
+                        // .action(ArgAction::Set)
+                        .required(true),
+                )
                 .arg_required_else_help(true),
         )
 }
@@ -96,15 +105,20 @@ fn cli() -> Command {
 fn run() -> Result<(), ()> {
     let matches = cli().get_matches();
 
-    match matches
+    let _ = match matches
         .subcommand()
         .map(|(f, rest)| (SubcommandType::from(f), rest))
     {
-        Some((SubcommandType::LIST, _)) => {}
+        Some((SubcommandType::LIST, arg_matches)) => {
+            let path = arg_matches.get_one::<String>("FILE");
+            println!("Reading database file at: {:?}", path);
+            let access = RecutilsDatabaseAccess::new(path.unwrap(), "Link".to_string());
+            list_command::run(access)
+        }
         _ => todo!(),
-    }
+    };
 
-    println!("{:?}", matches);
+    // println!("{:?}", matches);
 
     Ok(())
 }
@@ -128,7 +142,13 @@ pub mod tests {
         println!("{:?}", actual);
 
         assert_eq!(actual.subcommand().unwrap().0, "ls");
-        assert_eq!(actual.subcommand().unwrap().1.ids().len(), 1);
-        assert!(actual.subcommand().unwrap().1.contains_id("FILE"));
+
+        let subcommand_args = actual.subcommand().unwrap().1;
+        assert_eq!(subcommand_args.ids().len(), 1);
+        assert!(subcommand_args.contains_id("FILE"));
+        assert_eq!(
+            subcommand_args.get_one::<String>("FILE"),
+            Some(&"$FILE".to_string())
+        );
     }
 }
