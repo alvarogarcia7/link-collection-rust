@@ -2,3 +2,4 @@ target/
 .idea/
 Cargo.lock
 
+/data_access/data/links_mod.rec
