@@ -14,10 +14,10 @@ mod common;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum SubcommandType {
-    LIST,
+    List,
 }
 
-const COMMANDS_AND_NAMES: [(&str, SubcommandType); 1] = [("ls", SubcommandType::LIST)];
+const COMMANDS_AND_NAMES: [(&str, SubcommandType); 1] = [("ls", SubcommandType::List)];
 
 // // #[repr(String)]
 // trait SubcommandType {
@@ -91,7 +91,7 @@ fn cli() -> Command {
         .arg_required_else_help(true)
         // .allow_external_subcommands(true)
         .subcommand(
-            Command::new(SubcommandType::LIST)
+            Command::new(SubcommandType::List)
                 .about("Reads a file")
                 .arg(
                     arg!(<FILE> "The database file to read")
@@ -109,7 +109,7 @@ fn run() -> Result<(), ()> {
         .subcommand()
         .map(|(f, rest)| (SubcommandType::from(f), rest))
     {
-        Some((SubcommandType::LIST, arg_matches)) => {
+        Some((SubcommandType::List, arg_matches)) => {
             let path = arg_matches.get_one::<String>("FILE");
             println!("Reading database file at: {:?}", path);
             let access = RecutilsDatabaseAccess::new(path.unwrap(), "Link".to_string());
