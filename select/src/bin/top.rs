@@ -263,30 +263,23 @@ pub mod tests {
 
     use crate::{Cli, Commands};
 
-    #[test]
-    pub fn parse_the_list_subcommand() {
-        let arg_vec = ["", "list", "$FILE"];
-
-        let actual = Cli::parse_from(arg_vec.iter());
-
-        assert_eq!(
-            actual.command,
-            Commands::List {
-                file: "$FILE".to_string()
-            }
-        );
+    fn data_provider() -> Vec<&'static str> {
+        vec!["list", "ls"]
     }
+
     #[test]
-    pub fn parse_the_list_subcommand_with_alias() {
-        let arg_vec = ["", "ls", "$FILE"];
+    fn parse_the_list_subcommand_with_any_variant() {
+        for subcommand in data_provider() {
+            let arg_vec = ["", subcommand, "$FILE"];
 
-        let actual = Cli::parse_from(arg_vec.iter());
+            let actual = Cli::parse_from(arg_vec.iter());
 
-        assert_eq!(
-            actual.command,
-            Commands::List {
-                file: "$FILE".to_string()
-            }
-        );
+            assert_eq!(
+                actual.command,
+                Commands::List {
+                    file: "$FILE".to_string()
+                }
+            );
+        }
     }
 }
