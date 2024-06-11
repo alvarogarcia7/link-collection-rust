@@ -21,7 +21,7 @@ struct Cli {
 
 #[derive(Debug, Subcommand, PartialEq)]
 enum Commands {
-    #[command(arg_required_else_help = true)]
+    #[command(alias="ls", arg_required_else_help = true)]
     List {
         file: String,
     },
@@ -264,8 +264,22 @@ pub mod tests {
     use crate::{Cli, Commands};
 
     #[test]
-    pub fn parse_the_ls_subcommand() {
+    pub fn parse_the_list_subcommand() {
         let arg_vec = ["", "list", "$FILE"];
+
+        let actual = Cli::parse_from(arg_vec.iter());
+        println!("{:?}", actual);
+
+        assert_eq!(
+            actual.command,
+            Commands::List {
+                file: "$FILE".to_string()
+            }
+        );
+    }
+    #[test]
+    pub fn parse_the_list_subcommand_with_alias() {
+        let arg_vec = ["", "ls", "$FILE"];
 
         let actual = Cli::parse_from(arg_vec.iter());
         println!("{:?}", actual);
