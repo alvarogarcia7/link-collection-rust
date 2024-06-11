@@ -21,7 +21,7 @@ struct Cli {
 
 #[derive(Debug, Subcommand, PartialEq)]
 enum Commands {
-    #[command(alias="ls", arg_required_else_help = true)]
+    #[command(alias = "ls", arg_required_else_help = true)]
     List {
         file: String,
     },
@@ -268,7 +268,6 @@ pub mod tests {
         let arg_vec = ["", "list", "$FILE"];
 
         let actual = Cli::parse_from(arg_vec.iter());
-        println!("{:?}", actual);
 
         assert_eq!(
             actual.command,
@@ -282,7 +281,6 @@ pub mod tests {
         let arg_vec = ["", "ls", "$FILE"];
 
         let actual = Cli::parse_from(arg_vec.iter());
-        println!("{:?}", actual);
 
         assert_eq!(
             actual.command,
