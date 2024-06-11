@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = "4.5.7"
+clap = { version = "4.5.7", features = ["derive"] }
 rrecutils = { git = "https://github.com/aisamanra/rrecutils.git", version = "0.1.0" }
 domain = { path = "../domain" }
 data_access = { path = "../data_access" }
