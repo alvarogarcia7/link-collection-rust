@@ -1,9 +1,14 @@
-# Backlog 
+# Backlog
+## Legend
+* ✅ - Done
+* 🚧 - In progress
+* 🚀 - Ready to start
 ### EPIC - ID:1 - Read existing database files
-#### STORY - ID:1.1 - Dump the contents into the console
-#### STORY - ID:1.2 - Use a template to print to console
+#### ✅STORY - ID:1.1 - Dump the contents into the console
+#### 🚧STORY - ID:1.2 - Use a template to print to console
 ### EPIC - ID:6 - Create a cli application
-#### STORY - ID:6.2 - Use clap to for top command and multiple subcommands
+#### 🚧STORY - ID:6.1 - Use clap to for top command and multiple subcommands
+* TODO: Read this cookbook: https://docs.rs/clap/latest/clap/_derive/_cookbook/git_derive/index.html
 * TODO: Read https://docs.rs/clap/latest/clap/ and implement it with:
 ```rust
 use clap::Parser;
