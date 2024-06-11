@@ -34,6 +34,7 @@ fn main() {
     }
 }
 ```
+### STORY - ID:6.2 - Add a logger
 ### EPIC - ID:2 - Add a new record to the database
 ### EPIC - ID:3 - Retrieve items
 ### EPIC - ID:4 - Download items from HackerNews
