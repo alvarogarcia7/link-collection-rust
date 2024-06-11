@@ -6,11 +6,9 @@ use clap::builder::Str;
 use clap::{arg, Command};
 
 use data_access::recutils_database::RecutilsDatabaseAccess;
-
-use crate::commands::list_command;
-
-mod commands;
-mod common;
+use domain::Record;
+use select::commands::list_command;
+use select::commands::list_command::MyError;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum SubcommandType {
@@ -102,10 +100,10 @@ fn cli() -> Command {
         )
 }
 
-fn run() -> Result<(), ()> {
+fn run() -> Result<Vec<Record>, MyError> {
     let matches = cli().get_matches();
 
-    let _ = match matches
+    match matches
         .subcommand()
         .map(|(f, rest)| (SubcommandType::from(f), rest))
     {
@@ -116,18 +114,16 @@ fn run() -> Result<(), ()> {
             list_command::run(access)
         }
         _ => todo!(),
-    };
-
-    // println!("{:?}", matches);
-
-    Ok(())
+    }
 }
 
 pub fn main() {
-    match run() {
-        Ok(()) => (),
-        Err(e) => println!("{:?}", e),
-    }
+    run().unwrap();
+    // match
+    // {
+    //     Ok(_) => (),
+    //     Err(e) => println!("{:?}", e),
+    // }
 }
 
 #[cfg(test)]

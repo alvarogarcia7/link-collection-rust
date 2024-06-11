@@ -49,12 +49,15 @@ impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
             .map(|foreign| {
                 // foreign.fields.iter().map(|x|)
                 let mut fields: HashMap<String, String> = HashMap::new();
+                let mut foreign_fields = vec![];
                 for (key, value) in foreign.fields.iter() {
                     fields.insert(key.to_string(), value.to_string());
+                    foreign_fields.push((key.clone(), value.clone()));
                 }
                 Record {
                     record_type: self.record_type.clone(),
                     fields,
+                    fields_dto: foreign_fields,
                 }
             })
             .collect::<Vec<Record>>();
