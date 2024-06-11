@@ -256,13 +256,13 @@ pub mod tests {
 
     use crate::{Cli, Commands};
 
-    fn data_provider() -> Vec<&'static str> {
+    fn data_provider_list() -> Vec<&'static str> {
         vec!["list", "ls"]
     }
 
     #[test]
     fn parse_the_list_subcommand_with_any_variant() {
-        for subcommand in data_provider() {
+        for subcommand in data_provider_list() {
             let arg_vec = ["", subcommand, "$FILE"];
 
             let actual = Cli::parse_from(arg_vec.iter());
