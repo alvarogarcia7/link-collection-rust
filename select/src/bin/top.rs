@@ -6,7 +6,7 @@ use std::path::Path;
 use std::process::exit;
 
 // use clap::{Args, Parser, Subcommand, ValueEnum};
-use clap::{Parser, Subcommand};
+use clap::{arg, Parser, Subcommand};
 // use clap::arg;
 use clap::builder::Str;
 use select::print::run;
@@ -22,35 +22,24 @@ struct Cli {
     command: Commands,
 }
 
-trait Run {
-    fn run(self) -> Result<(), ()>;
-}
-
-impl Run for Commands {
-    fn run(self) -> Result<(), ()> {
-        match self {
-            Commands::List { file } => {
-                let database_path = Path::new(file.as_str());
-                if !database_path.exists() {
-                    eprintln!("Database file does not exist: {:?}", database_path);
-                    return Err(());
-                }
-                let template_path = Path::new("./select/template/");
-                if !template_path.exists() {
-                    eprintln!("template path does not exist: {:?}", template_path);
-                    return Err(());
-                }
+impl<'a> App<'a> {
+    fn new(global_configuration: GlobalConfiguration<'a>) -> Self {
+        Self {
+            global_configuration,
+        }
+    }
+    fn run(self, commands: Commands) -> Result<(), ()> {
+        match commands {
+            Commands::List { file, target } => {
+                let destination_path = Path::new(&target);
                 run(
-                    database_path,
-                    template_path,
-                    "cli-short.mustache".to_string(),
-                    Path::new("./target/formatted.txt"),
+                    GlobalConfiguration::verify_path(&file).unwrap(),
+                    self.global_configuration.template_path,
+                    self.global_configuration.template_name,
+                    destination_path,
                 )
                 .unwrap();
-                println!(
-                    "Formatted file written to: {:?}",
-                    Path::new("./target/formatted.txt")
-                );
+                println!("Formatted file written to: {:?}", destination_path);
                 Ok(())
             }
             Commands::NewRecord { from } => {
@@ -66,6 +55,10 @@ impl Run for Commands {
                     );
                     return Err(());
                 }
+                println!(
+                    "Faking writing the database file with the new record: {:?}",
+                    self.global_configuration.database_path
+                );
                 Ok(())
             }
         }
@@ -75,7 +68,11 @@ impl Run for Commands {
 #[derive(Debug, Subcommand, PartialEq)]
 enum Commands {
     #[command(alias = "ls", arg_required_else_help = true)]
-    List { file: String },
+    List {
+        file: String,
+        #[arg(default_missing_value = "-", default_value = "-")]
+        target: String,
+    },
     #[command(alias = "n")]
     NewRecord {
         #[arg(
@@ -161,10 +158,50 @@ enum Commands {
 //     message: Option<String>,
 // }
 
+struct GlobalConfiguration<'a> {
+    database_path: &'a Path,
+    template_path: &'a Path,
+    template_name: String,
+}
+
+impl<'a> GlobalConfiguration<'a> {
+    fn verify_path(raw_value: &str) -> Option<&Path> {
+        let path = Path::new(raw_value);
+        if !path.exists() {
+            eprintln!("PWD: {:?}", env::current_dir());
+            eprintln!("This path does not exist: {:?}", path);
+            return None;
+        }
+        Some(path)
+    }
+    pub fn in_memory(
+        database_path: &'a str,
+        template_path: &'a str,
+        template_name: String,
+    ) -> Self {
+        Self {
+            database_path: GlobalConfiguration::verify_path(database_path).unwrap(),
+            template_path: GlobalConfiguration::verify_path(template_path).unwrap(),
+            template_name,
+        }
+    }
+}
+
+struct App<'a> {
+    global_configuration: GlobalConfiguration<'a>,
+}
+
 fn main() {
     let args = Cli::parse();
 
-    Run::run(args.command)
+    let global_configuration = GlobalConfiguration::in_memory(
+        "./data/links.rec",
+        "./template/",
+        "cli-short.mustache".to_string(),
+    );
+
+    App::new(global_configuration)
+        .run(args.command)
         .map(|_| exit(0))
         .map_err(|_| exit(1))
         .unwrap();
@@ -337,7 +374,8 @@ pub mod test_parsing_commands {
             assert_eq!(
                 actual.command,
                 Commands::List {
-                    file: "$FILE".to_string()
+                    file: "$FILE".to_string(),
+                    target: "-".to_string()
                 }
             );
         }
@@ -390,19 +428,29 @@ pub mod test_parsing_commands {
 pub mod test_executing_commands {
     use super::*;
 
+    fn global_configuration_test<'a>() -> GlobalConfiguration<'a> {
+        GlobalConfiguration::in_memory(
+            "./tests/data/links.rec",
+            "./template/",
+            "cli-short.mustache".to_string(),
+        )
+    }
+
     #[test]
     #[ignore]
     fn run_the_list_subcommand() {
-        Run::run(Commands::List {
-            file: "data/links.rec".to_string(),
-        })
-        .unwrap();
+        App::new(global_configuration_test())
+            .run(Commands::List {
+                file: "tests/data/links.rec".to_string(),
+                target: "-".to_string(),
+            })
+            .unwrap();
     }
 
     #[test]
     fn run_the_newrecord_subcommand_from_the_cli_reader() {
         assert_eq!(
-            Run::run(Commands::NewRecord {
+            App::new(global_configuration_test()).run(Commands::NewRecord {
                 from: "cli_line_reader".to_string(),
             }),
             Ok(())
@@ -412,7 +460,7 @@ pub mod test_executing_commands {
     #[test]
     fn run_the_newrecord_subcommand_from_file() {
         assert_eq!(
-            Run::run(Commands::NewRecord {
+            App::new(global_configuration_test()).run(Commands::NewRecord {
                 from: "./tests/data/new-record-1.txt".to_string(),
             }),
             Ok(())
