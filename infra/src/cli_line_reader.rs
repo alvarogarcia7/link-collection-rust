@@ -1,6 +1,8 @@
 use crate::tags::{lowercase_separated_by_dash, split_tags};
 use domain::interfaces::record::RecordProvider;
-use domain::Record;
+
+use crate::date::{DateFormattable, DateFormatter, DateProvidable, DateProvider};
+pub(crate) use domain::Record;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::FileHistory;
@@ -14,8 +16,14 @@ pub struct CliReaderRecordProvider {
 impl CliReaderRecordProvider {}
 
 impl CliReaderRecordProvider {
-    pub fn new(line_reader: MyEditor) -> Self {
-        Self { line_reader }
+    pub fn new(
+        line_reader: MyEditor, /*, date_provider: DateProvider, id_provider: IdProvider*/
+    ) -> Self {
+        Self {
+            line_reader,
+            // date_provider,
+            // id_provider,
+        }
     }
 }
 
@@ -99,7 +107,7 @@ impl MyEditor {
 impl RecordProvider for CliReaderRecordProvider {
     fn fetch(&mut self) -> Record {
         let id = "a1a6925a-7958-11e8-a87f-0242ac110002".to_string();
-        let formatted_date = "Tue, 26 Jun 2018 15:50:21 +0000".to_string();
+        let formatted_date = DateFormatter::default().format(&DateProvider::default().now());
 
         let fields_dto = vec![
             ("Id".to_string(), id),
