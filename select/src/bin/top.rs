@@ -373,11 +373,14 @@ pub mod test_parsing_commands {
 
 #[cfg(test)]
 pub mod test_executing_commands {
+    use super::*;
 
-    // #[test]
-    // fn run_the_list_subcommand() {
-    //     Run::run(Commands::List {
-    //         file: "data/links.rec".to_string(),
-    //     });
-    // }
+    #[test]
+    #[ignore]
+    fn run_the_list_subcommand() {
+        Run::run(Commands::List {
+            file: "data/links.rec".to_string(),
+        })
+        .unwrap();
+    }
 }
