@@ -1,29 +1,26 @@
-pub fn split_tags(tags: impl Iterator<Item = String>) -> impl Iterator<Item = String> {
-    // tags.flat_map(|x| str::split(&x, ','))
-    //     .map(|x| x.trim())
-    //     .filter(|&x| !x.is_empty())
-    //     .map(|x| x.to_string())
-
-    // tags.map(|x| x.as_str())
-    let f = |x| x.split(',').map(|x| x.trim()).map(|x| x.to_string());
-    tags.flat_map(f).filter(|x| !x.is_empty())
-    // .map(|x| x.to_string())
+pub fn split_tags(tags: Vec<String>) -> Vec<String> {
+    tags.iter()
+        .flat_map(|x| x.split(','))
+        .map(|x| x.trim())
+        .filter(|x| !x.is_empty())
+        .map(|x| x.to_string())
+        .collect::<Vec<String>>()
 }
 
-pub fn lowercase_separated_by_dash(
-    tags: impl Iterator<Item = String>,
-) -> impl Iterator<Item = String> {
-    tags.map(|x| x.to_lowercase().replace(' ', "-"))
+pub fn lowercase_separated_by_dash(tags: Vec<String>) -> Vec<String> {
+    tags.iter()
+        .map(|x| x.to_lowercase().replace(' ', "-"))
         .map(|x| x.to_string())
+        .collect::<Vec<String>>()
 }
 #[cfg(test)]
 pub mod splitting_tests {
     use super::*;
 
     // Note: Can override a function from production code to do some preprocessing
-    fn split_tags(tags: Vec<String>) -> Vec<String> {
-        super::split_tags(tags.into_iter()).collect::<Vec<String>>()
-    }
+    // fn split_tags(tags: Vec<String>) -> Vec<String> {
+    //     super::split_tags(tags.iter()).collect()
+    // }
     #[test]
     fn keep_the_tags_as_is() {
         assert_eq!(
@@ -104,11 +101,6 @@ pub mod splitting_tests {
 #[cfg(test)]
 pub mod lowercasing_tests {
     use super::*;
-
-    // Note: Can override a function from production code to do some preprocessing
-    fn lowercase_separated_by_dash(tags: Vec<String>) -> Vec<String> {
-        super::lowercase_separated_by_dash(tags.into_iter()).collect::<Vec<String>>()
-    }
 
     #[test]
     fn lowercase_tags() {

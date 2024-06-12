@@ -1,4 +1,4 @@
-use crate::tags::lowercase_separated_by_dash;
+use crate::tags::{lowercase_separated_by_dash, split_tags};
 use domain::interfaces::record::RecordProvider;
 use domain::Record;
 use rustyline::config::Configurer;
@@ -121,14 +121,10 @@ impl RecordProvider for CliReaderRecordProvider {
             ),
             (
                 "Tags".to_string(),
-                // let h_compose_g = compose (g, h);
-                // h_c()
-                lowercase_separated_by_dash(
+                lowercase_separated_by_dash(split_tags(
                     self.line_reader
-                        .read_until_ctrl_d("Tags (one per line or separated by comma)".to_string())
-                        .into_iter(),
-                )
-                .collect::<Vec<String>>()
+                        .read_until_ctrl_d("Tags (one per line or separated by comma)".to_string()),
+                ))
                 .join(", "),
             ),
         ];
