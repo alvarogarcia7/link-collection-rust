@@ -1,12 +1,16 @@
 extern crate core;
 
 use core::str;
-// Source: https://docs.rs/clap/latest/clap/_derive/_cookbook/git_derive/index.html
+use std::path::Path;
+use std::process::exit;
 
-// use clap::arg;
-use clap::builder::Str;
 // use clap::{Args, Parser, Subcommand, ValueEnum};
 use clap::{Parser, Subcommand};
+// use clap::arg;
+use clap::builder::Str;
+use select::print::run;
+
+// Source: https://docs.rs/clap/latest/clap/_derive/_cookbook/git_derive/index.html
 
 /// A fictional versioning CLI
 #[derive(Debug, Parser)] // requires `derive` feature
@@ -15,6 +19,41 @@ use clap::{Parser, Subcommand};
 struct Cli {
     #[command(subcommand)]
     command: Commands,
+}
+
+trait Run {
+    fn run(self) -> Result<(), ()>;
+}
+
+impl Run for Commands {
+    fn run(self) -> Result<(), ()> {
+        match self {
+            Commands::List { file } => {
+                let database_path = Path::new(file.as_str());
+                if !database_path.exists() {
+                    eprintln!("Database file does not exist: {:?}", database_path);
+                    return Err(());
+                }
+                let template_path = Path::new("./select/template/");
+                if !template_path.exists() {
+                    eprintln!("template path does not exist: {:?}", template_path);
+                    return Err(());
+                }
+                run(
+                    database_path,
+                    template_path,
+                    "cli-short.mustache".to_string(),
+                    Path::new("./target/formatted.txt"),
+                )
+                .unwrap();
+                println!(
+                    "Formatted file written to: {:?}",
+                    Path::new("./target/formatted.txt")
+                );
+                Ok(())
+            }
+        }
+    }
 }
 
 #[derive(Debug, Subcommand, PartialEq)]
@@ -101,65 +140,69 @@ enum Commands {
 fn main() {
     let args = Cli::parse();
 
-    match args.command {
-        Commands::List { file } => {
-            println!("Cloning {file}");
-        } //     Commands::Diff {
-          //         mut base,
-          //         mut head,
-          //         mut path,
-          //         color,
-          //     } => {
-          //         if path.is_none() {
-          //             path = head;
-          //             head = None;
-          //             if path.is_none() {
-          //                 path = base;
-          //                 base = None;
-          //             }
-          //         }
-          //         let base = base
-          //             .as_deref()
-          //             .map(|s| s.to_str().unwrap())
-          //             .unwrap_or("stage");
-          //         let head = head
-          //             .as_deref()
-          //             .map(|s| s.to_str().unwrap())
-          //             .unwrap_or("worktree");
-          //         let path = path.as_deref().unwrap_or_else(|| OsStr::new(""));
-          //         println!(
-          //             "Diffing {}..{} {} (color={})",
-          //             base,
-          //             head,
-          //             path.to_string_lossy(),
-          //             color
-          //         );
-          //     }
-          //     Commands::Push { remote } => {
-          //         println!("Pushing to {remote}");
-          //     }
-          //     Commands::Add { path } => {
-          //         println!("Adding {path:?}");
-          //     }
-          //     Commands::Stash(stash) => {
-          //         let stash_cmd = stash.command.unwrap_or(StashCommands::Push(stash.push));
-          //         match stash_cmd {
-          //             StashCommands::Push(push) => {
-          //                 println!("Pushing {push:?}");
-          //             }
-          //             StashCommands::Pop { stash } => {
-          //                 println!("Popping {stash:?}");
-          //             }
-          //             StashCommands::Apply { stash } => {
-          //                 println!("Applying {stash:?}");
-          //             }
-          //         }
-          //     }
-          //     Commands::External(args) => {
-          //         println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);
-          //     }
-    }
-}
+    Run::run(args.command)
+        .map(|_| exit(0))
+        .map_err(|_| exit(1))
+        .unwrap();
+    // match args.command {
+    //     Commands::List { file } => {
+    //         println!("Cloning {file}");
+} //     Commands::Diff {
+  //         mut base,
+  //         mut head,
+  //         mut path,
+  //         color,
+  //     } => {
+  //         if path.is_none() {
+  //             path = head;
+  //             head = None;
+  //             if path.is_none() {
+  //                 path = base;
+  //                 base = None;
+  //             }
+  //         }
+  //         let base = base
+  //             .as_deref()
+  //             .map(|s| s.to_str().unwrap())
+  //             .unwrap_or("stage");
+  //         let head = head
+  //             .as_deref()
+  //             .map(|s| s.to_str().unwrap())
+  //             .unwrap_or("worktree");
+  //         let path = path.as_deref().unwrap_or_else(|| OsStr::new(""));
+  //         println!(
+  //             "Diffing {}..{} {} (color={})",
+  //             base,
+  //             head,
+  //             path.to_string_lossy(),
+  //             color
+  //         );
+  //     }
+  //     Commands::Push { remote } => {
+  //         println!("Pushing to {remote}");
+  //     }
+  //     Commands::Add { path } => {
+  //         println!("Adding {path:?}");
+  //     }
+  //     Commands::Stash(stash) => {
+  //         let stash_cmd = stash.command.unwrap_or(StashCommands::Push(stash.push));
+  //         match stash_cmd {
+  //             StashCommands::Push(push) => {
+  //                 println!("Pushing {push:?}");
+  //             }
+  //             StashCommands::Pop { stash } => {
+  //                 println!("Popping {stash:?}");
+  //             }
+  //             StashCommands::Apply { stash } => {
+  //                 println!("Applying {stash:?}");
+  //             }
+  //         }
+  //     }
+  //     Commands::External(args) => {
+  //         println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);
+  //     }
+  // }
+  // }
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum SubcommandType {
@@ -275,4 +318,11 @@ pub mod tests {
             );
         }
     }
+
+    // #[test]
+    // fn run_the_list_subcommand() {
+    //     Run::run(Commands::List {
+    //         file: "data/links.rec".to_string(),
+    //     });
+    // }
 }

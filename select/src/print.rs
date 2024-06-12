@@ -1,14 +1,8 @@
-// Source: https://github.com/aisamanra/rrecutils/blob/master/src/tools/format.rs
-extern crate clap;
-extern crate rrecutils;
-extern crate rustache;
-
+use rustache::Render;
 use std::fs::File;
 use std::io::{BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::{env, io};
-
-use rustache::Render;
 
 struct R {
     rec: rrecutils::Record,
@@ -54,12 +48,12 @@ fn render_to_single_file(
     Ok(())
 }
 
-fn run(
+pub fn run(
     database_path: &Path,
     template_path: &Path,
     template_name: String,
     destination: &Path,
-) -> Result<(), ()> {
+) -> Result<(), String> {
     println!("PWD: {:?}", env::current_dir());
 
     let file = File::open(database_path).unwrap();
@@ -70,12 +64,12 @@ fn run(
     let buf1 = template_path.join(template_name);
     let template: String = match File::open::<PathBuf>(buf1) {
         Ok(mut path) => {
-            use io::Read;
+            use std::io::Read;
             let mut buf = Vec::new();
             path.read_to_end(&mut buf).unwrap();
             String::from_utf8(buf).unwrap()
         }
-        Err(_) => panic!("No template specified!"),
+        Err(f) => return Err(format!("The specified template {:?} was not found", f)),
     };
 
     render_to_single_file(
@@ -83,24 +77,15 @@ fn run(
         None,
         recfile,
         template,
-    )?;
+    )
+    .unwrap();
 
     Ok(())
 }
 
-pub fn main() {
-    run(
-        Path::new("./data_access/data/links.rec"),
-        Path::new("./select/template/"),
-        "cli-short.mustache".to_string(),
-        Path::new("./target/formatted.txt"),
-    )
-    .unwrap();
-}
-
 #[cfg(test)]
 pub mod tests {
-    use crate::run;
+    use super::*;
     use std::path::Path;
 
     #[test]
