@@ -51,10 +51,10 @@ impl MyReadline for MyEditor {
         let mut lines = vec![];
         self.print_prompt(&format!("Type '{}' (CTRL-D to finish)", query));
         loop {
-            let readline = self.read_line_raw(">>");
+            let readline = self.read_line_raw(">> ");
             match readline {
                 Ok(line_value) => {
-                    println!("Line: {}", line_value);
+                    // println!("Line: {}", line_value);
                     lines.push(line_value.trim().to_string());
                 }
                 Err(ReadlineError::Interrupted) => {
@@ -76,10 +76,10 @@ impl MyReadline for MyEditor {
     fn read_line(&mut self, query: String) -> String {
         self.print_prompt(&format!("Type '{}' (Enter to finish)", query));
         loop {
-            let readline = self.read_line_raw(">>");
+            let readline = self.read_line_raw(">> ");
             match readline {
                 Ok(line_value) => {
-                    println!("Line: {}", line_value);
+                    // println!("Line: {}", line_value);
                     return line_value.trim().to_string();
                 }
                 Err(ReadlineError::Interrupted) => {

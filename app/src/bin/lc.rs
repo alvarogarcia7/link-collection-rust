@@ -80,7 +80,7 @@ enum Commands {
     #[command(alias = "ls", arg_required_else_help = true)]
     List {
         file: String,
-        #[arg(default_missing_value = "-", default_value = "-")]
+        #[arg(default_missing_value = "stdout", default_value = "stdout")]
         target: String,
     },
     #[command(alias = "n")]
@@ -329,7 +329,7 @@ pub mod test_parsing_commands {
                 actual.command,
                 Commands::List {
                     file: "$FILE".to_string(),
-                    target: "-".to_string()
+                    target: "stdout".to_string()
                 }
             );
         }

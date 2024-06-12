@@ -2,7 +2,7 @@ use rustache::Render;
 use std::fs::File;
 use std::io::{BufReader, Write};
 use std::path::{Path, PathBuf};
-use std::{env, io};
+use std::{env, fs, io};
 
 struct R {
     rec: rrecutils::Record,
@@ -48,6 +48,13 @@ fn render_to_single_file(
     Ok(())
 }
 
+pub fn output_from_spec(spec: &str) -> io::Result<Box<dyn Write>> {
+    match spec {
+        "stdout" => Ok(Box::new(io::stdout())),
+        path => Ok(Box::new(fs::File::open(path)?)),
+    }
+}
+
 pub fn run(
     database_path: &Path,
     template_path: &Path,
@@ -73,7 +80,7 @@ pub fn run(
     };
 
     render_to_single_file(
-        Box::new(File::create(destination).unwrap()),
+        output_from_spec(destination.to_str().unwrap()).unwrap(),
         None,
         recfile,
         template,
