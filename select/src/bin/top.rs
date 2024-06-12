@@ -303,7 +303,7 @@ impl From<&str> for SubcommandType {
 // }
 
 #[cfg(test)]
-pub mod tests {
+pub mod test_parsing_commands {
     use clap::Parser;
 
     use crate::{Cli, Commands};
@@ -369,6 +369,10 @@ pub mod tests {
             }
         );
     }
+}
+
+#[cfg(test)]
+pub mod test_executing_commands {
 
     // #[test]
     // fn run_the_list_subcommand() {
