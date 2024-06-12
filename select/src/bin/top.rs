@@ -53,13 +53,8 @@ impl<'a> App<'a> {
                 let record_provider = Self::decide_which_provider(&from);
                 // AGB: alternative: ok_or_else
                 let mut record_provider = record_provider.ok_or(())?;
-                println!("{:?}", record_provider.fetch());
-                println!(
-                    "Faking writing the database file with the new record: {:?}",
-                    self.global_configuration.database_path
-                );
                 NewRecordUseCase::new(self.global_configuration)
-                    .run(&*record_provider)
+                    .run(&mut *record_provider)
                     .map_err(|_| ())
             }
         }

@@ -17,11 +17,14 @@ impl RecordProvider for HardcodedRecordProvider {
             ),
             (
                 "Date".to_string(),
-                "Tue, 26 Jun 2018 15:50:21 +0000".to_string(),
+                "Tue, 12 Jun 2024 10:50:21 +0000".to_string(),
             ),
             ("Category".to_string(), "category1".to_string()),
             ("Title".to_string(), "Good title".to_string()),
-            ("Body".to_string(), ["Body Line1", "Body line 2"].join("\n")),
+            (
+                "Body".to_string(),
+                ["Body Line1", "Body line 2", "LONG LONG LONG "].join("\n"),
+            ),
             (
                 "Tags".to_string(),
                 lowercase_separated_by_dash(split_tags(vec![
