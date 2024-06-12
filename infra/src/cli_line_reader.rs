@@ -1,3 +1,4 @@
+use crate::tags::{lowercase_separated_by_dash, split_tags};
 use domain::interfaces::record::RecordProvider;
 use domain::Record;
 use rustyline::config::Configurer;
@@ -118,7 +119,14 @@ impl RecordProvider for CliReaderRecordProvider {
                 self.line_reader
                     .read_line("Category (mandatory)".to_string()),
             ),
-            ("Tags".to_string(), "tag1, tag_2, name-surname".to_string()),
+            (
+                "Tags".to_string(),
+                lowercase_separated_by_dash(split_tags(
+                    self.line_reader
+                        .read_until_ctrl_d("Tags (one per line or separated by comma)".to_string()),
+                ))
+                .join(", "),
+            ),
         ];
 
         let mut fields: HashMap<String, String> = HashMap::with_capacity(fields_dto.len());
