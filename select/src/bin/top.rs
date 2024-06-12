@@ -179,7 +179,7 @@ impl<'a> App<'a> {
                     let category = "category1".to_string();
                     let formatted_tags = "tag1, tag_2, name-surname".to_string();
 
-                    let fields_raw = vec![
+                    let fields_dto = vec![
                         ("Id".to_string(), id),
                         ("Date".to_string(), formatted_date),
                         ("Category".to_string(), category),
@@ -194,16 +194,17 @@ impl<'a> App<'a> {
                         ("Tags".to_string(), formatted_tags),
                     ];
 
-                    let mut hm: HashMap<String, String> = HashMap::with_capacity(fields_raw.len());
+                    let mut fields: HashMap<String, String> =
+                        HashMap::with_capacity(fields_dto.len());
 
-                    for (key, value) in fields_raw.iter() {
-                        hm.insert(key.clone(), value.clone());
+                    for (key, value) in fields_dto.iter() {
+                        fields.insert(key.clone(), value.clone());
                     }
 
                     let record = Record {
                         record_type: "Link".to_string(),
-                        fields: hm,
-                        fields_dto: fields_raw,
+                        fields,
+                        fields_dto,
                     };
 
                     println!("{:?}", record);
