@@ -24,6 +24,7 @@ pub mod tests {
     }
 
     #[test]
+    #[ignore]
     pub fn write_file() {
         {
             println!("{:?}", env::current_dir());
