@@ -46,19 +46,22 @@ impl<'a> App<'a> {
                 if "cli_line_reader" == from {
                     return Ok(());
                 }
-                let new_record_path = Path::new(&from);
-                if !new_record_path.exists() {
-                    eprintln!("PWD: {:?}", env::current_dir());
-                    eprintln!(
-                        "The path for the new record does not exist: {:?}",
-                        new_record_path
-                    );
-                    return Err(());
-                }
-                println!(
-                    "Faking writing the database file with the new record: {:?}",
-                    self.global_configuration.database_path
-                );
+                let record_file = GlobalConfiguration::verify_path(&from);
+                match record_file {
+                    None => {
+                        return Err(());
+                    }
+                    Some(record_file) => {
+                        println!(
+                            "Faking reading the record file with the new record: {:?}",
+                            record_file
+                        );
+                        println!(
+                            "Faking writing the database file with the new record: {:?}",
+                            self.global_configuration.database_path
+                        )
+                    }
+                };
                 Ok(())
             }
         }
