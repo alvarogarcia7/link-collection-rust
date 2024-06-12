@@ -5,7 +5,8 @@
 * 🚀 - Ready to start
 ### EPIC - ID:1 - Read existing database files
 #### ✅STORY - ID:1.1 - Dump the contents into the console
-#### 🚧STORY - ID:1.2 - Use a template to print to console
+#### ✅STORY - ID:1.2 - Use a fixed template to print to console
+#### 🚀STORY - ID:1.3 - Use any template to print to console
 ### EPIC - ID:6 - Create a cli application
 #### 🚧STORY - ID:6.1 - Use clap to for top command and multiple subcommands
 * TODO: Read this cookbook: https://docs.rs/clap/latest/clap/_derive/_cookbook/git_derive/index.html
