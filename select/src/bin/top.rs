@@ -442,7 +442,7 @@ pub mod test_executing_commands {
         App::new(global_configuration_test())
             .run(Commands::List {
                 file: "tests/data/links.rec".to_string(),
-                target: "-".to_string(),
+                target: "/dev/null".to_string(),
             })
             .unwrap();
     }
