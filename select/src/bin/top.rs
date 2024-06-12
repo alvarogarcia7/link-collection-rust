@@ -52,6 +52,7 @@ impl Run for Commands {
                 );
                 Ok(())
             }
+            Commands::NewRecord { from: _ } => Ok(()),
         }
     }
 }
@@ -60,6 +61,14 @@ impl Run for Commands {
 enum Commands {
     #[command(alias = "ls", arg_required_else_help = true)]
     List { file: String },
+    #[command(alias = "n")]
+    NewRecord {
+        #[arg(
+            default_missing_value = "cli_line_reader",
+            default_value = "cli_line_reader"
+        )]
+        from: String,
+    },
     // Compare two commits
     // Diff {
     //     #[arg(value_name = "COMMIT")]
@@ -317,6 +326,48 @@ pub mod tests {
                 }
             );
         }
+    }
+
+    #[test]
+    fn parse_the_new_subcommand_with_any_variant() {
+        for subcommand in ["new-record", "n"] {
+            let arg_vec = ["", subcommand];
+
+            let actual = Cli::parse_from(arg_vec.iter());
+
+            assert_eq!(
+                actual.command,
+                Commands::NewRecord {
+                    from: "cli_line_reader".to_string()
+                }
+            );
+        }
+    }
+    #[test]
+    fn parse_the_new_subcommand_with_the_default_from() {
+        let arg_vec = ["", "new-record"];
+
+        let actual = Cli::parse_from(arg_vec.iter());
+
+        assert_eq!(
+            actual.command,
+            Commands::NewRecord {
+                from: "cli_line_reader".to_string()
+            }
+        );
+    }
+    #[test]
+    fn parse_the_new_subcommand_with_an_overridden_from() {
+        let arg_vec = ["", "new-record", "file.txt"];
+
+        let actual = Cli::parse_from(arg_vec.iter());
+
+        assert_eq!(
+            actual.command,
+            Commands::NewRecord {
+                from: "file.txt".to_string()
+            }
+        );
     }
 
     // #[test]
