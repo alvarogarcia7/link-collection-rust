@@ -493,7 +493,7 @@ pub mod test_executing_commands {
     }
 
     #[test]
-    #[ignore]
+    #[ignore] // This test uses the filesystem
     fn run_the_list_subcommand() {
         App::new(global_configuration_test())
             .run(Commands::List {
@@ -514,6 +514,7 @@ pub mod test_executing_commands {
     // }
 
     #[test]
+    #[ignore] // This test uses the filesystem
     fn run_the_newrecord_subcommand_from_file() {
         assert_eq!(
             App::new(global_configuration_test()).run(Commands::NewRecord {
