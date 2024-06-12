@@ -11,17 +11,19 @@ use std::collections::HashMap;
 
 pub struct CliReaderRecordProvider {
     pub line_reader: MyEditor,
+    pub date_provider: DateProvider,
 }
 
 impl CliReaderRecordProvider {}
 
 impl CliReaderRecordProvider {
     pub fn new(
-        line_reader: MyEditor, /*, date_provider: DateProvider, id_provider: IdProvider*/
+        line_reader: MyEditor,
+        date_provider: DateProvider, /*id_provider: IdProvider*/
     ) -> Self {
         Self {
             line_reader,
-            // date_provider,
+            date_provider,
             // id_provider,
         }
     }
@@ -108,7 +110,7 @@ use uuid::Uuid;
 impl RecordProvider for CliReaderRecordProvider {
     fn fetch(&mut self) -> Record {
         let id = Uuid::new_v4().to_string();
-        let formatted_date = DateFormatter::default().format(&DateProvider::default().now());
+        let formatted_date = DateFormatter::default().format(&self.date_provider.now());
 
         let fields_dto = vec![
             ("Id".to_string(), id),

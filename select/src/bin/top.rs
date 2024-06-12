@@ -9,6 +9,7 @@ use clap::{arg, Parser, Subcommand};
 
 use domain::interfaces::record::RecordProvider;
 use infra::cli_line_reader::{CliReaderRecordProvider, MyEditor};
+use infra::date::DateProvider;
 use infra::file_record_reader::FileReaderRecordProvider;
 use infra::hardcoded::HardcodedRecordProvider;
 use select::commands::NewRecordUseCase;
@@ -68,8 +69,10 @@ impl<'a> App<'a> {
         if "hardcoded" == provider_name {
             Some(Box::<HardcodedRecordProvider>::default() as Box<dyn RecordProvider>)
         } else if "cli_line_reader" == provider_name {
-            Some(Box::new(CliReaderRecordProvider::new(MyEditor::default()))
-                as Box<dyn RecordProvider>)
+            Some(Box::new(CliReaderRecordProvider::new(
+                MyEditor::default(),
+                DateProvider::default(),
+            )) as Box<dyn RecordProvider>)
         } else {
             let record_file = GlobalConfiguration::verify_path(provider_name)?;
             Some(Box::new(FileReaderRecordProvider::new(record_file)) as Box<dyn RecordProvider>)
