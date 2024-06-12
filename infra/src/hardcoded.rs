@@ -1,3 +1,4 @@
+use crate::tags::{lowercase_separated_by_dash, split_tags};
 use domain::interfaces::record::RecordProvider;
 use domain::Record;
 use std::collections::HashMap;
@@ -21,7 +22,14 @@ impl RecordProvider for HardcodedRecordProvider {
             ("Category".to_string(), "category1".to_string()),
             ("Title".to_string(), "Good title".to_string()),
             ("Body".to_string(), ["Body Line1", "Body line 2"].join("\n")),
-            ("Tags".to_string(), "tag1, tag_2, name-surname".to_string()),
+            (
+                "Tags".to_string(),
+                lowercase_separated_by_dash(split_tags(vec![
+                    "Tag 1, tag 2".to_string(),
+                    "Another TAg".to_string(),
+                ]))
+                .join(", "),
+            ),
         ];
         let mut fields: HashMap<String, String> = HashMap::with_capacity(fields_dto.len());
 
