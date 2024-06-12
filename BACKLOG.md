@@ -37,6 +37,7 @@ fn main() {
 ```
 ### STORY - ID:6.2 - Add a logger
 ### EPIC - ID:2 - Add a new record to the database
+### 🚀STORY - ID:2.1 - From the CLI
 ### EPIC - ID:3 - Retrieve items
 ### EPIC - ID:4 - Download items from HackerNews
 ### EPIC - ID:5 - Create a new wrapper on top of recutils library
