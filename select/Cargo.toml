@@ -9,3 +9,4 @@ rrecutils = { git = "https://github.com/aisamanra/rrecutils.git", version = "0.1
 domain = { path = "../domain" }
 data_access = { path = "../data_access" }
 rustache = "0.1.0"
+rustyline = "14.0.0"

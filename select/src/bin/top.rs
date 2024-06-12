@@ -22,6 +22,55 @@ struct Cli {
     command: Commands,
 }
 
+use rustyline::config::Configurer;
+use rustyline::error::ReadlineError;
+use rustyline::history::{DefaultHistory, FileHistory, History, MemHistory};
+use rustyline::{DefaultEditor, EditMode, Editor, Helper};
+
+struct MyEditor<H: Helper, I: History> {
+    rl: Editor<H, I>,
+}
+
+impl<H: Helper, I: History> Default for MyEditor<H, I> {
+    fn default() -> Self {
+        let mut result: Editor<H, I> = DefaultEditor::new().unwrap();
+        result.set_edit_mode(EditMode::Vi);
+        Self { rl: result }
+    }
+}
+
+trait MyReadline {
+    fn read_until_ctrl_d(&mut self, query: &str) -> Vec<String>;
+}
+
+impl<H: Helper, I: History> MyReadline for MyEditor<H, I> {
+    fn read_until_ctrl_d(&mut self, query: &str) -> Vec<String> {
+        let mut lines = vec![];
+        loop {
+            let readline = self.rl.readline(query);
+            match readline {
+                Ok(line) => {
+                    lines.push(line.clone());
+                    println!("Line: {}", line);
+                }
+                Err(ReadlineError::Interrupted) => {
+                    println!("CTRL-C");
+                    break;
+                }
+                Err(ReadlineError::Eof) => {
+                    println!("CTRL-D");
+                    break;
+                }
+                Err(err) => {
+                    println!("Error: {:?}", err);
+                    break;
+                }
+            }
+        }
+        lines
+    }
+}
+
 impl<'a> App<'a> {
     fn new(global_configuration: GlobalConfiguration<'a>) -> Self {
         Self {
@@ -44,6 +93,10 @@ impl<'a> App<'a> {
             }
             Commands::NewRecord { from } => {
                 if "cli_line_reader" == from {
+                    // let mut rl = DefaultEditor::my_default().unwrap();
+                    let mut rl: MyEditor<(), FileHistory> = MyEditor::default();
+                    let body = rl.read_until_ctrl_d("Body");
+                    println!("Body: {:?}", body);
                     return Ok(());
                 }
                 let record_file = GlobalConfiguration::verify_path(&from);
@@ -198,8 +251,8 @@ fn main() {
     let args = Cli::parse();
 
     let global_configuration = GlobalConfiguration::in_memory(
-        "./data/links.rec",
-        "./template/",
+        "./data/database/links.rec",
+        "./data/template/",
         "cli-short.mustache".to_string(),
     );
 
