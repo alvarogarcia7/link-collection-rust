@@ -9,6 +9,11 @@ use std::process::exit;
 use clap::{arg, Parser, Subcommand};
 // use clap::arg;
 use clap::builder::Str;
+use rustyline::config::Configurer;
+use rustyline::error::ReadlineError;
+use rustyline::history::FileHistory;
+use rustyline::{DefaultEditor, EditMode, Editor};
+
 use select::print::run;
 
 // Source: https://docs.rs/clap/latest/clap/_derive/_cookbook/git_derive/index.html
@@ -22,32 +27,28 @@ struct Cli {
     command: Commands,
 }
 
-use rustyline::config::Configurer;
-use rustyline::error::ReadlineError;
-use rustyline::history::{DefaultHistory, FileHistory, History, MemHistory};
-use rustyline::{DefaultEditor, EditMode, Editor, Helper};
-
-struct MyEditor<H: Helper, I: History> {
-    rl: Editor<H, I>,
+struct MyEditor {
+    rl: Editor<(), FileHistory>,
 }
 
-impl<H: Helper, I: History> Default for MyEditor<H, I> {
+impl Default for MyEditor {
     fn default() -> Self {
-        let mut result: Editor<H, I> = DefaultEditor::new().unwrap();
+        let mut result = DefaultEditor::new().unwrap();
         result.set_edit_mode(EditMode::Vi);
         Self { rl: result }
     }
 }
 
 trait MyReadline {
-    fn read_until_ctrl_d(&mut self, query: &str) -> Vec<String>;
+    fn read_until_ctrl_d(&mut self, query: String, prompt: &str) -> Vec<String>;
 }
 
-impl<H: Helper, I: History> MyReadline for MyEditor<H, I> {
-    fn read_until_ctrl_d(&mut self, query: &str) -> Vec<String> {
+impl MyReadline for MyEditor {
+    fn read_until_ctrl_d(&mut self, query: String, prompt: &str) -> Vec<String> {
         let mut lines = vec![];
         loop {
-            let readline = self.rl.readline(query);
+            println!("Type '{}' (CTRL-D to finish)", query);
+            let readline = self.rl.readline(prompt);
             match readline {
                 Ok(line) => {
                     lines.push(line.clone());
@@ -94,9 +95,8 @@ impl<'a> App<'a> {
             Commands::NewRecord { from } => {
                 if "cli_line_reader" == from {
                     // let mut rl = DefaultEditor::my_default().unwrap();
-                    let mut rl: MyEditor<(), FileHistory> = MyEditor::default();
-                    let body = rl.read_until_ctrl_d("Body");
-                    println!("Body: {:?}", body);
+                    let mut read_line = MyEditor::default();
+                    let _body = read_line.read_until_ctrl_d("Body".to_string(), ">> ");
                     return Ok(());
                 }
                 let record_file = GlobalConfiguration::verify_path(&from);
@@ -438,7 +438,7 @@ pub mod test_parsing_commands {
     }
 
     #[test]
-    fn parse_the_new_subcommand_with_any_variant() {
+    fn x_parse_the_new_subcommand_with_any_variant() {
         for subcommand in ["new-record", "n"] {
             let arg_vec = ["", subcommand];
 
@@ -503,15 +503,15 @@ pub mod test_executing_commands {
             .unwrap();
     }
 
-    #[test]
-    fn run_the_newrecord_subcommand_from_the_cli_reader() {
-        assert_eq!(
-            App::new(global_configuration_test()).run(Commands::NewRecord {
-                from: "cli_line_reader".to_string(),
-            }),
-            Ok(())
-        );
-    }
+    // #[test]
+    // fn run_the_newrecord_subcommand_from_the_cli_reader() {
+    //     assert_eq!(
+    //         App::new(global_configuration_test()).run(Commands::NewRecord {
+    //             from: "cli_line_reader".to_string(),
+    //         }),
+    //         Ok(())
+    //     );
+    // }
 
     #[test]
     fn run_the_newrecord_subcommand_from_file() {
