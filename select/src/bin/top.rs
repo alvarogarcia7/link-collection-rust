@@ -1,6 +1,7 @@
 extern crate core;
 
 use core::str;
+use std::env;
 use std::path::Path;
 use std::process::exit;
 
@@ -53,8 +54,17 @@ impl Run for Commands {
                 Ok(())
             }
             Commands::NewRecord { from } => {
-                if "cli_new_reader" == from {
-                    return Ok(())
+                if "cli_line_reader" == from {
+                    return Ok(());
+                }
+                let new_record_path = Path::new(&from);
+                if !new_record_path.exists() {
+                    eprintln!("PWD: {:?}", env::current_dir());
+                    eprintln!(
+                        "The path for the new record does not exist: {:?}",
+                        new_record_path
+                    );
+                    return Err(());
                 }
                 Ok(())
             }
@@ -394,6 +404,16 @@ pub mod test_executing_commands {
         assert_eq!(
             Run::run(Commands::NewRecord {
                 from: "cli_line_reader".to_string(),
+            }),
+            Ok(())
+        );
+    }
+
+    #[test]
+    fn run_the_newrecord_subcommand_from_file() {
+        assert_eq!(
+            Run::run(Commands::NewRecord {
+                from: "./tests/data/new-record-1.txt".to_string(),
             }),
             Ok(())
         );
