@@ -52,7 +52,12 @@ impl Run for Commands {
                 );
                 Ok(())
             }
-            Commands::NewRecord { from: _ } => Ok(()),
+            Commands::NewRecord { from } => {
+                if "cli_new_reader" == from {
+                    return Ok(())
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -382,5 +387,15 @@ pub mod test_executing_commands {
             file: "data/links.rec".to_string(),
         })
         .unwrap();
+    }
+
+    #[test]
+    fn run_the_newrecord_subcommand_from_the_cli_reader() {
+        assert_eq!(
+            Run::run(Commands::NewRecord {
+                from: "cli_line_reader".to_string(),
+            }),
+            Ok(())
+        );
     }
 }
