@@ -103,10 +103,11 @@ impl MyEditor {
         self.rl.readline(prompt)
     }
 }
+use uuid::Uuid;
 
 impl RecordProvider for CliReaderRecordProvider {
     fn fetch(&mut self) -> Record {
-        let id = "a1a6925a-7958-11e8-a87f-0242ac110002".to_string();
+        let id = Uuid::new_v4().to_string();
         let formatted_date = DateFormatter::default().format(&DateProvider::default().now());
 
         let fields_dto = vec![
