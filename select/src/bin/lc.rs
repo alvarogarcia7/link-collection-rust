@@ -22,7 +22,7 @@ use select::print::run;
 
 /// A fictional versioning CLI
 #[derive(Debug, Parser)] // requires `derive` feature
-#[command(name = "git")]
+#[command(name = "lc")]
 #[command(about = "A fictional versioning CLI", long_about = None)]
 struct Cli {
     #[command(subcommand)]
