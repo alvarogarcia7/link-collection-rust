@@ -34,7 +34,10 @@ impl RecordProvider for FileReaderRecordProvider {
             ),
             ("Category".to_string(), "category1".to_string()),
             ("Title".to_string(), "Good title".to_string()),
-            ("Body".to_string(), ["Body Line1", "Body line 2"].join("\n")),
+            (
+                "Body".to_string(),
+                ["Body Line1", "Body line 2"].join("\n+"),
+            ),
             ("Tags".to_string(), "tag1, tag_2, name-surname".to_string()),
         ];
         let mut fields: HashMap<String, String> = HashMap::with_capacity(fields_dto.len());
