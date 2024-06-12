@@ -1,3 +1,6 @@
+use crate::configuration::GlobalConfiguration;
+use domain::interfaces::record::RecordProvider;
+
 pub mod list_command {
     use domain::interfaces::database::DatabaseReadAccess;
     use domain::Record;
@@ -12,5 +15,29 @@ pub mod list_command {
         //     println!("{:?}", x)
         // }
         Ok(database.read_all())
+    }
+}
+
+pub struct NewRecordUseCase<'a> {
+    global_configuration: GlobalConfiguration<'a>,
+}
+
+pub enum NewRecordUseCaseError {
+    None,
+}
+
+impl<'a> NewRecordUseCase<'a> {
+    pub fn new(global_configuration: GlobalConfiguration<'a>) -> Self {
+        Self {
+            global_configuration,
+        }
+    }
+
+    pub fn run(&self, _record_provider: &dyn RecordProvider) -> Result<(), NewRecordUseCaseError> {
+        println!(
+            "Running NewRecordUseCase with configuration: {:?}",
+            self.global_configuration
+        );
+        Ok(())
     }
 }

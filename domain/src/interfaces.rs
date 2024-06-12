@@ -5,3 +5,11 @@ pub mod database {
         fn read_all(self) -> Vec<Record>;
     }
 }
+
+pub mod record {
+    use crate::Record;
+
+    pub trait RecordProvider {
+        fn fetch(&mut self) -> Record;
+    }
+}

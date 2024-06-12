@@ -1,22 +1,21 @@
 extern crate core;
 
 use core::str;
-use std::collections::HashMap;
-use std::env;
 use std::path::Path;
 use std::process::exit;
 
 // use clap::{Args, Parser, Subcommand, ValueEnum};
 use clap::{arg, Parser, Subcommand};
-// use clap::arg;
-use clap::builder::Str;
-use domain::Record;
-use rustyline::config::Configurer;
-use rustyline::error::ReadlineError;
-use rustyline::history::FileHistory;
-use rustyline::{DefaultEditor, EditMode, Editor};
 
+use domain::interfaces::record::RecordProvider;
+use infra::cli_line_reader::{CliReaderRecordProvider, MyEditor};
+use infra::file_record_reader::FileReaderRecordProvider;
+use infra::hardcoded::HardcodedRecordProvider;
+use select::commands::NewRecordUseCase;
+use select::configuration::GlobalConfiguration;
 use select::print::run;
+
+// use clap::arg;
 
 // Source: https://docs.rs/clap/latest/clap/_derive/_cookbook/git_derive/index.html
 
@@ -27,83 +26,6 @@ use select::print::run;
 struct Cli {
     #[command(subcommand)]
     command: Commands,
-}
-
-struct MyEditor {
-    rl: Editor<(), FileHistory>,
-}
-
-impl Default for MyEditor {
-    fn default() -> Self {
-        let mut result = DefaultEditor::new().unwrap();
-        result.set_edit_mode(EditMode::Vi);
-        Self { rl: result }
-    }
-}
-
-trait MyReadline {
-    fn read_until_ctrl_d(&mut self, query: String) -> Vec<String>;
-    fn read_line(&mut self, query: String) -> String;
-}
-
-impl MyReadline for MyEditor {
-    fn read_until_ctrl_d(&mut self, query: String) -> Vec<String> {
-        let mut lines = vec![];
-        self.print_prompt(&format!("Type '{}' (CTRL-D to finish)", query));
-        loop {
-            let readline = self.read_line_raw(">>");
-            match readline {
-                Ok(line_value) => {
-                    println!("Line: {}", line_value);
-                    lines.push(line_value.trim().to_string());
-                }
-                Err(ReadlineError::Interrupted) => {
-                    println!("CTRL-C");
-                    break;
-                }
-                Err(ReadlineError::Eof) => {
-                    println!("CTRL-D");
-                    break;
-                }
-                Err(err) => {
-                    println!("Error: {:?}", err);
-                }
-            }
-        }
-        lines
-    }
-
-    fn read_line(&mut self, query: String) -> String {
-        self.print_prompt(&format!("Type '{}' (Enter to finish)", query));
-        loop {
-            let readline = self.read_line_raw(">>");
-            match readline {
-                Ok(line_value) => {
-                    println!("Line: {}", line_value);
-                    return line_value.trim().to_string();
-                }
-                Err(ReadlineError::Interrupted) => {
-                    println!("CTRL-C");
-                }
-                Err(ReadlineError::Eof) => {
-                    println!("CTRL-D");
-                }
-                Err(err) => {
-                    println!("Error: {:?}", err);
-                }
-            }
-        }
-    }
-}
-
-impl MyEditor {
-    fn print_prompt(&self, prompt: &str) {
-        println!("{}", prompt);
-    }
-
-    fn read_line_raw(&mut self, prompt: &str) -> Result<String, ReadlineError> {
-        self.rl.readline(prompt)
-    }
 }
 
 impl<'a> App<'a> {
@@ -127,108 +49,30 @@ impl<'a> App<'a> {
                 Ok(())
             }
             Commands::NewRecord { from } => {
-                if "hardcoded" == from {
-                    let fields_raw = vec![
-                        (
-                            "Id".to_string(),
-                            "a1a6925a-7958-11e8-a87f-0242ac110002".to_string(),
-                        ),
-                        (
-                            "Date".to_string(),
-                            "Tue, 26 Jun 2018 15:50:21 +0000".to_string(),
-                        ),
-                        ("Category".to_string(), "category1".to_string()),
-                        ("Title".to_string(), "Good title".to_string()),
-                        ("Body".to_string(), ["Body Line1", "Body line 2"].join("\n")),
-                        ("Tags".to_string(), "tag1, tag_2, name-surname".to_string()),
-                    ];
-
-                    let mut hm: HashMap<String, String> = HashMap::with_capacity(fields_raw.len());
-
-                    for (key, value) in fields_raw.iter() {
-                        hm.insert(key.clone(), value.clone());
-                    }
-
-                    let record = Record {
-                        record_type: "Link".to_string(),
-                        fields: hm,
-                        fields_dto: fields_raw,
-                    };
-
-                    println!("Record: {:?}", record);
-
-                    return Ok(());
-                }
-                if "cli_line_reader" == from {
-                    // let mut rl = DefaultEditor::my_default().unwrap();
-                    let mut read_line = MyEditor::default();
-                    // read_line.read_line("Title (mandatory)".to_string());
-                    // let _body = read_line.read_until_ctrl_d("Body".to_string());
-
-                    // Id: a1a6925a-7958-11e8-a87f-0242ac110002
-                    // Date: Tue, 26 Jun 2018 15:50:21 +0000
-                    // Category: category1
-                    // Title: Title
-                    // Body: A body with multiple lines
-                    // +
-                    // + Another line
-                    // Tags: tag1, tag_2, name-surname
-
-                    let id = "a1a6925a-7958-11e8-a87f-0242ac110002".to_string();
-                    let formatted_date = "Tue, 26 Jun 2018 15:50:21 +0000".to_string();
-                    let category = "category1".to_string();
-                    let formatted_tags = "tag1, tag_2, name-surname".to_string();
-
-                    let fields_dto = vec![
-                        ("Id".to_string(), id),
-                        ("Date".to_string(), formatted_date),
-                        ("Category".to_string(), category),
-                        (
-                            "Title".to_string(),
-                            read_line.read_line("Title (mandatory)".to_string()),
-                        ),
-                        (
-                            "Body".to_string(),
-                            read_line.read_until_ctrl_d("Body".to_string()).join("\n"),
-                        ),
-                        ("Tags".to_string(), formatted_tags),
-                    ];
-
-                    let mut fields: HashMap<String, String> =
-                        HashMap::with_capacity(fields_dto.len());
-
-                    for (key, value) in fields_dto.iter() {
-                        fields.insert(key.clone(), value.clone());
-                    }
-
-                    let record = Record {
-                        record_type: "Link".to_string(),
-                        fields,
-                        fields_dto,
-                    };
-
-                    println!("{:?}", record);
-
-                    return Ok(());
-                }
-                let record_file = GlobalConfiguration::verify_path(&from);
-                match record_file {
-                    None => {
-                        return Err(());
-                    }
-                    Some(record_file) => {
-                        println!(
-                            "Faking reading the record file with the new record: {:?}",
-                            record_file
-                        );
-                        println!(
-                            "Faking writing the database file with the new record: {:?}",
-                            self.global_configuration.database_path
-                        )
-                    }
-                };
-                Ok(())
+                let record_provider = Self::decide_which_provider(&from);
+                // AGB: alternative: ok_or_else
+                let mut record_provider = record_provider.ok_or(())?;
+                println!("{:?}", record_provider.fetch());
+                println!(
+                    "Faking writing the database file with the new record: {:?}",
+                    self.global_configuration.database_path
+                );
+                NewRecordUseCase::new(self.global_configuration)
+                    .run(&*record_provider)
+                    .map_err(|_| ())
             }
+        }
+    }
+
+    fn decide_which_provider(provider_name: &String) -> Option<Box<dyn RecordProvider + 'static>> {
+        if "hardcoded" == provider_name {
+            Some(Box::<HardcodedRecordProvider>::default() as Box<dyn RecordProvider>)
+        } else if "cli_line_reader" == provider_name {
+            Some(Box::new(CliReaderRecordProvider::new(MyEditor::default()))
+                as Box<dyn RecordProvider>)
+        } else {
+            let record_file = GlobalConfiguration::verify_path(provider_name)?;
+            Some(Box::new(FileReaderRecordProvider::new(record_file)) as Box<dyn RecordProvider>)
         }
     }
 }
@@ -326,35 +170,6 @@ enum Commands {
 //     message: Option<String>,
 // }
 
-struct GlobalConfiguration<'a> {
-    database_path: &'a Path,
-    template_path: &'a Path,
-    template_name: String,
-}
-
-impl<'a> GlobalConfiguration<'a> {
-    fn verify_path(raw_value: &str) -> Option<&Path> {
-        let path = Path::new(raw_value);
-        if !path.exists() {
-            eprintln!("PWD: {:?}", env::current_dir());
-            eprintln!("This path does not exist: {:?}", path);
-            return None;
-        }
-        Some(path)
-    }
-    pub fn in_memory(
-        database_path: &'a str,
-        template_path: &'a str,
-        template_name: String,
-    ) -> Self {
-        Self {
-            database_path: GlobalConfiguration::verify_path(database_path).unwrap(),
-            template_path: GlobalConfiguration::verify_path(template_path).unwrap(),
-            template_name,
-        }
-    }
-}
-
 struct App<'a> {
     global_configuration: GlobalConfiguration<'a>,
 }
@@ -433,13 +248,6 @@ fn main() {
   // }
   // }
 
-#[derive(PartialEq, Copy, Clone)]
-pub enum SubcommandType {
-    List,
-}
-
-const COMMANDS_AND_NAMES: [(&str, SubcommandType); 1] = [("ls", SubcommandType::List)];
-
 // // #[repr(String)]
 // trait SubcommandType {
 //     fn to_string(self) -> String;
@@ -484,26 +292,6 @@ const COMMANDS_AND_NAMES: [(&str, SubcommandType); 1] = [("ls", SubcommandType::
 //         "a".
 //     }
 // }
-
-impl From<SubcommandType> for Str {
-    fn from(value: SubcommandType) -> Self {
-        let (x, _) = COMMANDS_AND_NAMES
-            .iter()
-            .find(|(_, x)| x == &value)
-            .unwrap();
-        Self::from(*x)
-    }
-}
-
-impl From<&str> for SubcommandType {
-    fn from(value: &str) -> Self {
-        let (_, x) = COMMANDS_AND_NAMES
-            .iter()
-            .find(|(x, _)| x == &value)
-            .unwrap();
-        *x
-    }
-}
 
 // fn run() -> Result<Vec<Record>, MyError> {
 //     let matches = Cli::parse().get_matches();
