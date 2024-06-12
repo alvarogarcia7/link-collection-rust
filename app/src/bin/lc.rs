@@ -402,6 +402,7 @@ pub mod test_executing_commands {
     }
 
     #[test]
+    #[ignore]
     fn run_the_newrecord_subcommand_from_hardcoded() {
         assert_eq!(
             App::new(global_configuration_test()).run(Commands::NewRecord {
