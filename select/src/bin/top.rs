@@ -1,6 +1,7 @@
 extern crate core;
 
 use core::str;
+use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 use std::process::exit;
@@ -9,6 +10,7 @@ use std::process::exit;
 use clap::{arg, Parser, Subcommand};
 // use clap::arg;
 use clap::builder::Str;
+use domain::Record;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::FileHistory;
@@ -40,19 +42,20 @@ impl Default for MyEditor {
 }
 
 trait MyReadline {
-    fn read_until_ctrl_d(&mut self, query: String, prompt: &str) -> Vec<String>;
+    fn read_until_ctrl_d(&mut self, query: String) -> Vec<String>;
+    fn read_line(&mut self, query: String) -> String;
 }
 
 impl MyReadline for MyEditor {
-    fn read_until_ctrl_d(&mut self, query: String, prompt: &str) -> Vec<String> {
+    fn read_until_ctrl_d(&mut self, query: String) -> Vec<String> {
         let mut lines = vec![];
+        self.print_prompt(&format!("Type '{}' (CTRL-D to finish)", query));
         loop {
-            println!("Type '{}' (CTRL-D to finish)", query);
-            let readline = self.rl.readline(prompt);
+            let readline = self.read_line_raw(">>");
             match readline {
-                Ok(line) => {
-                    lines.push(line.clone());
-                    println!("Line: {}", line);
+                Ok(line_value) => {
+                    println!("Line: {}", line_value);
+                    lines.push(line_value.trim().to_string());
                 }
                 Err(ReadlineError::Interrupted) => {
                     println!("CTRL-C");
@@ -64,11 +67,42 @@ impl MyReadline for MyEditor {
                 }
                 Err(err) => {
                     println!("Error: {:?}", err);
-                    break;
                 }
             }
         }
         lines
+    }
+
+    fn read_line(&mut self, query: String) -> String {
+        self.print_prompt(&format!("Type '{}' (Enter to finish)", query));
+        loop {
+            let readline = self.read_line_raw(">>");
+            match readline {
+                Ok(line_value) => {
+                    println!("Line: {}", line_value);
+                    return line_value.trim().to_string();
+                }
+                Err(ReadlineError::Interrupted) => {
+                    println!("CTRL-C");
+                }
+                Err(ReadlineError::Eof) => {
+                    println!("CTRL-D");
+                }
+                Err(err) => {
+                    println!("Error: {:?}", err);
+                }
+            }
+        }
+    }
+}
+
+impl MyEditor {
+    fn print_prompt(&self, prompt: &str) {
+        println!("{}", prompt);
+    }
+
+    fn read_line_raw(&mut self, prompt: &str) -> Result<String, ReadlineError> {
+        self.rl.readline(prompt)
     }
 }
 
@@ -93,10 +127,87 @@ impl<'a> App<'a> {
                 Ok(())
             }
             Commands::NewRecord { from } => {
+                if "hardcoded" == from {
+                    let fields_raw = vec![
+                        (
+                            "Id".to_string(),
+                            "a1a6925a-7958-11e8-a87f-0242ac110002".to_string(),
+                        ),
+                        (
+                            "Date".to_string(),
+                            "Tue, 26 Jun 2018 15:50:21 +0000".to_string(),
+                        ),
+                        ("Category".to_string(), "category1".to_string()),
+                        ("Title".to_string(), "Good title".to_string()),
+                        ("Body".to_string(), ["Body Line1", "Body line 2"].join("\n")),
+                        ("Tags".to_string(), "tag1, tag_2, name-surname".to_string()),
+                    ];
+
+                    let mut hm: HashMap<String, String> = HashMap::with_capacity(fields_raw.len());
+
+                    for (key, value) in fields_raw.iter() {
+                        hm.insert(key.clone(), value.clone());
+                    }
+
+                    let record = Record {
+                        record_type: "Link".to_string(),
+                        fields: hm,
+                        fields_dto: fields_raw,
+                    };
+
+                    println!("Record: {:?}", record);
+
+                    return Ok(());
+                }
                 if "cli_line_reader" == from {
                     // let mut rl = DefaultEditor::my_default().unwrap();
                     let mut read_line = MyEditor::default();
-                    let _body = read_line.read_until_ctrl_d("Body".to_string(), ">> ");
+                    // read_line.read_line("Title (mandatory)".to_string());
+                    // let _body = read_line.read_until_ctrl_d("Body".to_string());
+
+                    // Id: a1a6925a-7958-11e8-a87f-0242ac110002
+                    // Date: Tue, 26 Jun 2018 15:50:21 +0000
+                    // Category: category1
+                    // Title: Title
+                    // Body: A body with multiple lines
+                    // +
+                    // + Another line
+                    // Tags: tag1, tag_2, name-surname
+
+                    let id = "a1a6925a-7958-11e8-a87f-0242ac110002".to_string();
+                    let formatted_date = "Tue, 26 Jun 2018 15:50:21 +0000".to_string();
+                    let category = "category1".to_string();
+                    let formatted_tags = "tag1, tag_2, name-surname".to_string();
+
+                    let fields_raw = vec![
+                        ("Id".to_string(), id),
+                        ("Date".to_string(), formatted_date),
+                        ("Category".to_string(), category),
+                        (
+                            "Title".to_string(),
+                            read_line.read_line("Title (mandatory)".to_string()),
+                        ),
+                        (
+                            "Body".to_string(),
+                            read_line.read_until_ctrl_d("Body".to_string()).join("\n"),
+                        ),
+                        ("Tags".to_string(), formatted_tags),
+                    ];
+
+                    let mut hm: HashMap<String, String> = HashMap::with_capacity(fields_raw.len());
+
+                    for (key, value) in fields_raw.iter() {
+                        hm.insert(key.clone(), value.clone());
+                    }
+
+                    let record = Record {
+                        record_type: "Link".to_string(),
+                        fields: hm,
+                        fields_dto: fields_raw,
+                    };
+
+                    println!("{:?}", record);
+
                     return Ok(());
                 }
                 let record_file = GlobalConfiguration::verify_path(&from);
@@ -503,15 +614,15 @@ pub mod test_executing_commands {
             .unwrap();
     }
 
-    // #[test]
-    // fn run_the_newrecord_subcommand_from_the_cli_reader() {
-    //     assert_eq!(
-    //         App::new(global_configuration_test()).run(Commands::NewRecord {
-    //             from: "cli_line_reader".to_string(),
-    //         }),
-    //         Ok(())
-    //     );
-    // }
+    #[test]
+    fn run_the_newrecord_subcommand_from_hardcoded() {
+        assert_eq!(
+            App::new(global_configuration_test()).run(Commands::NewRecord {
+                from: "hardcoded".to_string(),
+            }),
+            Ok(())
+        );
+    }
 
     #[test]
     #[ignore] // This test uses the filesystem
