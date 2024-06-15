@@ -5,6 +5,7 @@ use rustyline::{DefaultEditor, EditMode, Editor};
 use uuid::Uuid;
 
 use domain::interfaces::record::RecordProvider;
+use domain::interfaces::RecordProviderError;
 pub(crate) use domain::Record;
 use domain::RecordGrain;
 
@@ -43,7 +44,7 @@ impl Default for MyEditor {
     }
 }
 
-trait MyReadline {
+pub trait MyReadline {
     fn read_until_ctrl_d(&mut self, query: String) -> Vec<String>;
     fn read_line(&mut self, query: String) -> String;
 }
@@ -109,7 +110,7 @@ impl MyEditor {
 }
 
 impl RecordProvider for CliReaderRecordProvider {
-    fn fetch(&mut self) -> Record {
+    fn fetch(&mut self) -> Result<Record, RecordProviderError> {
         let id = Uuid::new_v4().to_string();
         let formatted_date = DateFormatter::default().format(&self.date_provider.now());
 
@@ -147,9 +148,9 @@ impl RecordProvider for CliReaderRecordProvider {
             fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
-        Record {
+        Ok(Record {
             record_type: "Link".to_string(),
             fields,
-        }
+        })
     }
 }

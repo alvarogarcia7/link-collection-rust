@@ -1,7 +1,7 @@
 use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 
-use rrecutils::{Recfile, Record};
+use rrecutils::Recfile;
 
 use data_access::dto::to_dto;
 use domain::interfaces::record::RecordProvider;
@@ -46,10 +46,13 @@ impl<'a> NewRecordUseCase<'a> {
     ) -> Result<(), NewRecordUseCaseError> {
         let domain_record = _record_provider.fetch();
 
-        let dto_record: Record = to_dto(vec![domain_record]);
+        if domain_record.is_err() {
+            //TODO AGB: how to stack the errors?
+            return Err(NewRecordUseCaseError::None);
+        }
 
         let recfile = Recfile {
-            records: vec![dto_record],
+            records: vec![to_dto(vec![domain_record.unwrap()])],
         };
         assert_eq!(recfile.records.len(), 1);
 

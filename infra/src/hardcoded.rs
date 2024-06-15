@@ -1,4 +1,5 @@
 use domain::interfaces::record::RecordProvider;
+use domain::interfaces::RecordProviderError;
 use domain::{Record, RecordGrain};
 
 use crate::tags::{lowercase_separated_by_dash, split_tags};
@@ -9,7 +10,7 @@ pub struct HardcodedRecordProvider {}
 impl HardcodedRecordProvider {}
 
 impl RecordProvider for HardcodedRecordProvider {
-    fn fetch(&mut self) -> Record {
+    fn fetch(&mut self) -> Result<Record, RecordProviderError> {
         let field_values = vec![
             (
                 "Id".to_string(),
@@ -40,9 +41,9 @@ impl RecordProvider for HardcodedRecordProvider {
             fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
-        Record {
+        Ok(Record {
             record_type: "Link".to_string(),
             fields,
-        }
+        })
     }
 }

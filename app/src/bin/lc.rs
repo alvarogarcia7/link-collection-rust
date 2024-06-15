@@ -8,9 +8,11 @@ use std::process::exit;
 use clap::{arg, Parser, Subcommand};
 
 use domain::interfaces::record::RecordProvider;
+use downloader::downloader::FirebaseHackerNewsDownloader;
 use infra::cli_line_reader::{CliReaderRecordProvider, MyEditor};
 use infra::date::DateProvider;
 use infra::file_record_reader::FileReaderRecordProvider;
+use infra::hacker_news_importer::FirebaseHackerNewsImporterProvider;
 use infra::hardcoded::HardcodedRecordProvider;
 use select::commands::NewRecordUseCase;
 use select::configuration::GlobalConfiguration;
@@ -67,6 +69,23 @@ impl<'a> App<'a> {
             Some(Box::new(CliReaderRecordProvider::new(
                 MyEditor::default(),
                 DateProvider::default(),
+            )) as Box<dyn RecordProvider>)
+        } else if provider_name.starts_with("import") {
+            let maybe_id: Vec<&str> = provider_name.split(':').collect();
+            let id = maybe_id[1].parse::<u64>();
+            if id.is_err() {
+                print!(
+                    "Couldn't parse the number {:?}. Full string: {:?}",
+                    maybe_id[1], provider_name
+                );
+                return None;
+            }
+            let id = id.unwrap();
+            Some(Box::new(FirebaseHackerNewsImporterProvider::new(
+                MyEditor::default(),
+                DateProvider::default(),
+                FirebaseHackerNewsDownloader::new("http://0.0.0.0:8181".to_string()),
+                id,
             )) as Box<dyn RecordProvider>)
         } else {
             let record_file = GlobalConfiguration::verify_path(provider_name)?;

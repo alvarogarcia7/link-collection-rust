@@ -1,4 +1,5 @@
 use domain::interfaces::record::RecordProvider;
+use domain::interfaces::RecordProviderError;
 use domain::{Record, RecordGrain};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -17,7 +18,7 @@ impl FileReaderRecordProvider {
 }
 
 impl RecordProvider for FileReaderRecordProvider {
-    fn fetch(&mut self) -> Record {
+    fn fetch(&mut self) -> Result<Record, RecordProviderError> {
         println!(
             "Faking reading the record file with the new record: {:?}",
             self.path
@@ -37,9 +38,9 @@ impl RecordProvider for FileReaderRecordProvider {
             .iter()
             .map(|(k, v)| RecordGrain::new(k.to_string(), v.to_string()))
             .collect();
-        Record {
+        Ok(Record {
             record_type: "Link".to_string(),
             fields,
-        }
+        })
     }
 }

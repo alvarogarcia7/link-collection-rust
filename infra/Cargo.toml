@@ -8,6 +8,7 @@ chrono = "0.4.38"
 domain = { path = "../domain" }
 mockall = "0.12.1"
 rustyline = "14.0.0"
+downloader = { path = "../downloader" }
 
 [dependencies.uuid]
 version = "1.8.0"

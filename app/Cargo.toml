@@ -10,3 +10,4 @@ domain = { path = "../domain" }
 data_access = { path = "../data_access" }
 rustache = "0.1.0"
 infra = { path = "../infra" }
+downloader = { path = "../downloader"}
