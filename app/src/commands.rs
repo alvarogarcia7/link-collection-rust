@@ -3,6 +3,7 @@ use std::io::{BufWriter, Write};
 
 use rrecutils::{Recfile, Record};
 
+use data_access::dto::to_dto;
 use domain::interfaces::record::RecordProvider;
 
 use crate::configuration::GlobalConfiguration;
@@ -45,15 +46,7 @@ impl<'a> NewRecordUseCase<'a> {
     ) -> Result<(), NewRecordUseCaseError> {
         let domain_record = _record_provider.fetch();
 
-        let vec1 = domain_record
-            .fields
-            .iter()
-            .map(|grain| (grain.key.clone(), grain.key.clone()))
-            .collect();
-        let dto_record = Record {
-            rec_type: Some("Link".to_string()),
-            fields: vec1,
-        };
+        let dto_record: Record = to_dto(vec![domain_record]);
 
         let recfile = Recfile {
             records: vec![dto_record],

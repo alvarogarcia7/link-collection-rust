@@ -1,5 +1,7 @@
 pub mod recutils_database;
 
+pub mod dto;
+
 #[cfg(test)]
 pub mod tests {
     use std::env;
