@@ -2,10 +2,14 @@ pub mod recutils_database;
 
 #[cfg(test)]
 pub mod tests {
-    use rrecutils::{Recfile, Record};
     use std::env;
     use std::fs::File;
+    use std::io::Write;
     use std::io::{BufReader, BufWriter};
+
+    use rrecutils::{Recfile, Record};
+
+    use domain::RecordGrain;
 
     #[test]
     #[ignore]
@@ -21,6 +25,76 @@ pub mod tests {
         assert_eq!(records.len(), 2);
         assert_eq!(records[0].rec_type, None);
         assert_eq!(records[1].rec_type, Some("Link".to_string()));
+    }
+
+    #[test]
+    pub fn keep_the_order_of_the_fields() {
+        let fields_dto = vec![
+            (
+                "Id".to_string(),
+                "a1a6925a-7958-11e8-a87f-0242ac110002".to_string(),
+            ),
+            (
+                "Date".to_string(),
+                "Tue, 12 Jun 2024 10:50:21 +0000".to_string(),
+            ),
+            ("Category".to_string(), "category1".to_string()),
+            ("Title".to_string(), "Good title".to_string()),
+            (
+                "Body".to_string(),
+                ["Body Line1", "Body line 2", "LONG LONG LONG"].join("\n+"),
+            ),
+            ("Tags".to_string(), "tag1, tag_2, name-surname".to_string()),
+        ];
+        let mut fields: Vec<RecordGrain> = vec![];
+
+        for (key, value) in fields_dto.iter() {
+            fields.push(RecordGrain::new(key.clone(), value.clone()));
+        }
+
+        let record = domain::Record {
+            record_type: "Link".to_string(),
+            fields,
+            fields_dto,
+        };
+
+        // to dto
+
+        let vec1 = record
+            .fields
+            .iter()
+            .map(|grain| (grain.key.clone(), grain.value.clone()))
+            .collect();
+        let dto_record = Record {
+            rec_type: Some("Link".to_string()),
+            fields: vec1,
+        };
+
+        let rec_file = Recfile {
+            records: vec![dto_record],
+        };
+
+        let mut buffer = Vec::new();
+        {
+            let mut writer = std::io::BufWriter::new(&mut buffer);
+            rec_file.write(&mut writer).unwrap();
+            writer.flush().unwrap()
+        }
+
+        let actual = String::from_utf8(buffer).unwrap();
+
+        let expected = "Id: a1a6925a-7958-11e8-a87f-0242ac110002
+Date: Tue, 12 Jun 2024 10:50:21 +0000
+Category: category1
+Title: Good title
+Body: Body Line1
++Body line 2
++LONG LONG LONG
+Tags: tag1, tag_2, name-surname
+
+";
+
+        assert_eq!(actual, expected);
     }
 
     #[test]

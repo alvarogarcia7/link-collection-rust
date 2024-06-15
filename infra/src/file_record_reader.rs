@@ -1,5 +1,5 @@
 use domain::interfaces::record::RecordProvider;
-use domain::Record;
+use domain::{Record, RecordGrain};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -35,7 +35,7 @@ impl RecordProvider for FileReaderRecordProvider {
 
         let fields = fields_dto
             .iter()
-            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .map(|(k, v)| RecordGrain::new(k.to_string(), v.to_string()))
             .collect();
         let fields_dto = fields_dto
             .iter()

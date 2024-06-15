@@ -48,7 +48,7 @@ impl<'a> NewRecordUseCase<'a> {
         let vec1 = domain_record
             .fields
             .iter()
-            .map(|(k, v)| (k.clone(), v.clone()))
+            .map(|grain| (grain.key.clone(), grain.key.clone()))
             .collect();
         let dto_record = Record {
             rec_type: Some("Link".to_string()),

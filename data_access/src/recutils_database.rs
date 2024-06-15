@@ -1,12 +1,10 @@
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 
 use rrecutils::Recfile;
 
-use domain::Record;
-
 use domain::interfaces::database::DatabaseReadAccess;
+use domain::{Record, RecordGrain};
 
 pub struct RecutilsDatabaseAccess<'a> {
     // reader: &'a Recfile,
@@ -48,10 +46,10 @@ impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
             // ).collect::<Vec<Record>>();
             .map(|foreign| {
                 // foreign.fields.iter().map(|x|)
-                let mut fields: HashMap<String, String> = HashMap::new();
+                let mut fields: Vec<RecordGrain> = vec![];
                 let mut foreign_fields = vec![];
                 for (key, value) in foreign.fields.iter() {
-                    fields.insert(key.to_string(), value.to_string());
+                    fields.push(RecordGrain::new(key.to_string(), value.to_string()));
                     foreign_fields.push((key.clone(), value.clone()));
                 }
                 Record {

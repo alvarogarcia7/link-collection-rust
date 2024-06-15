@@ -1,13 +1,15 @@
-use crate::tags::{lowercase_separated_by_dash, split_tags};
-use domain::interfaces::record::RecordProvider;
-
-use crate::date::{DateFormattable, DateFormatter, DateProvidable, DateProvider};
-pub(crate) use domain::Record;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::FileHistory;
 use rustyline::{DefaultEditor, EditMode, Editor};
-use std::collections::HashMap;
+use uuid::Uuid;
+
+use domain::interfaces::record::RecordProvider;
+pub(crate) use domain::Record;
+use domain::RecordGrain;
+
+use crate::date::{DateFormattable, DateFormatter, DateProvidable, DateProvider};
+use crate::tags::{lowercase_separated_by_dash, split_tags};
 
 pub struct CliReaderRecordProvider {
     pub line_reader: MyEditor,
@@ -105,7 +107,6 @@ impl MyEditor {
         self.rl.readline(prompt)
     }
 }
-use uuid::Uuid;
 
 impl RecordProvider for CliReaderRecordProvider {
     fn fetch(&mut self) -> Record {
@@ -140,10 +141,10 @@ impl RecordProvider for CliReaderRecordProvider {
             ),
         ];
 
-        let mut fields: HashMap<String, String> = HashMap::with_capacity(fields_dto.len());
+        let mut fields: Vec<RecordGrain> = vec![];
 
         for (key, value) in fields_dto.iter() {
-            fields.insert(key.clone(), value.clone());
+            fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
         Record {

@@ -1,7 +1,7 @@
-use crate::tags::{lowercase_separated_by_dash, split_tags};
 use domain::interfaces::record::RecordProvider;
-use domain::Record;
-use std::collections::HashMap;
+use domain::{Record, RecordGrain};
+
+use crate::tags::{lowercase_separated_by_dash, split_tags};
 
 #[derive(Default)]
 pub struct HardcodedRecordProvider {}
@@ -34,10 +34,10 @@ impl RecordProvider for HardcodedRecordProvider {
                 .join(", "),
             ),
         ];
-        let mut fields: HashMap<String, String> = HashMap::with_capacity(fields_dto.len());
+        let mut fields: Vec<RecordGrain> = vec![];
 
         for (key, value) in fields_dto.iter() {
-            fields.insert(key.clone(), value.clone());
+            fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
         Record {

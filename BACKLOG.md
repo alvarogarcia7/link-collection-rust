@@ -42,6 +42,7 @@ fn main() {
 ### EPIC - ID:2 - Add a new record to the database
 ### ✅STORY - ID:2.1 - From the CLI
 ### 🚧STORY - ID:2.2 - From a (temporary) file
+### ✅DEFECT - ID:2.3 - Print the record in the same order as it was provided
 ### EPIC - ID:3 - Retrieve items
 ### EPIC - ID:4 - Download items from HackerNews
 ### EPIC - ID:5 - Create a new wrapper on top of recutils library
