@@ -6,7 +6,7 @@ format-check:
 	cargo fmt --all -- --check
 .PHONY: format-check
 
-test:
+test: up
 	cargo test --all --all-features --tests
 .PHONY: test
 
@@ -38,6 +38,3 @@ up:
 
 down:
 	docker compose down
-
-stubby-bash:
-	docker exec -it stubby4j bash

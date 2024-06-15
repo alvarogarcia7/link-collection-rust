@@ -1,15 +1,13 @@
 version: '3.9'
 services:
-  stubby4j:
-    image: azagniotov/stubby4j:latest-jre21
+  httpstub:
+    build:
+        context: .
+        dockerfile: ./downloader/tests/http-stubs/Dockerfile
+    working_dir: "/stubs"
+    command:
+      - gostub -p 8181
     volumes:
-      - "./downloader/tests/http-stubs/:/home/stubby4j/data"
-    container_name: stubby4j
+      - "./downloader/tests/http-stubs:/stubs"
     ports:
-      - "8882:8882"
-    environment:
-      YAML_CONFIG: stubs.yaml
-      LOCATION: 0.0.0.0
-      STUBS_PORT: 8882
-      WITH_DEBUG: --debug
-      WITH_WATCH: --watch
+      - "8181:8181"
