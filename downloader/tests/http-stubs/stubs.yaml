@@ -1,0 +1,38 @@
+# https://github.com/azagniotov/testing-microservices-in-docker-and-docker-compose/blob/master/stubby4j-yaml-config/stubs.yaml
+-  request:
+     method: GET
+     url: /api/v1/reservations/1
+
+# When sequenced responses is configured, on each incoming request to the same URI,
+# a subsequent response in the list will be sent to the client. The sequenced
+# responses play in a cycle (loop). In other words: after the response sequence plays
+# through, the cycle restarts on the next incoming request
+#
+# https://github.com/azagniotov/stubby4j#response-object-properties
+   response:
+     - status: 200
+       headers:
+         content-type: application/json
+       file: json/success.json
+
+#     - status: 400
+#       headers:
+#         content-type: application/json
+#       file: json/reservation.service.expected.failure.response.json
+#
+#     - status: 403
+#       headers:
+#         content-type: application/json
+#       file: json/reservation.service.unexpected.failure.response.json
+#
+#     - status: 500
+#       headers:
+#         content-type: application/json
+#       body: >
+#         {"code": 500, "message": "Internal Server Error"}
+#     - status: 200
+#       # HttpUtils creates ApacheHttpTransport with read timeout of 1000 milliseconds
+#       latency: 1500
+#       headers:
+#         content-type: application/json
+#       file: json/success.json

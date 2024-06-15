@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  stubby4j:
+    image: azagniotov/stubby4j:latest-jre21
+    volumes:
+      - "./downloader/tests/http-stubs/:/home/stubby4j/data"
+    container_name: stubby4j
+    ports:
+      - "8882:8882"
+    environment:
+      YAML_CONFIG: stubs.yaml
+      LOCATION: 0.0.0.0
+      STUBS_PORT: 8882
+      WITH_DEBUG: --debug
+      WITH_WATCH: --watch

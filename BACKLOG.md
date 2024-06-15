@@ -45,6 +45,8 @@ fn main() {
 ### ✅DEFECT - ID:2.3 - Print the record in the same order as it was provided
 ### EPIC - ID:3 - Retrieve items
 ### EPIC - ID:4 - Download items from HackerNews
+### 🚧STORY - ID:4.1 - Create a new stubbed HTTP server
+### 🚧STORY - ID:4.2 - Download the items from a URL
 ### EPIC - ID:5 - Create a new wrapper on top of recutils library
 #### STORY - ID:5.1 - Create it
 #### STORY - ID:5.2 - Publish it to crates.io

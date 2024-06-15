@@ -32,3 +32,12 @@ doc:
 .PHONY: doc
 
 all: format clippy test doc
+
+up:
+	docker compose up -d
+
+down:
+	docker compose down
+
+stubby-bash:
+	docker exec -it stubby4j bash
