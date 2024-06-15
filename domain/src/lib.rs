@@ -4,7 +4,6 @@ pub mod interfaces;
 pub struct Record {
     pub record_type: String,
     pub fields: Vec<RecordGrain>,
-    pub fields_dto: Vec<(String, String)>,
 }
 
 impl Record {}

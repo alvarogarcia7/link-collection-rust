@@ -29,7 +29,7 @@ pub mod tests {
 
     #[test]
     pub fn keep_the_order_of_the_fields() {
-        let fields_dto = vec![
+        let field_values = vec![
             (
                 "Id".to_string(),
                 "a1a6925a-7958-11e8-a87f-0242ac110002".to_string(),
@@ -48,14 +48,13 @@ pub mod tests {
         ];
         let mut fields: Vec<RecordGrain> = vec![];
 
-        for (key, value) in fields_dto.iter() {
+        for (key, value) in field_values.iter() {
             fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
         let record = domain::Record {
             record_type: "Link".to_string(),
             fields,
-            fields_dto,
         };
 
         // to dto

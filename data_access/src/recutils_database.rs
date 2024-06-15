@@ -55,7 +55,6 @@ impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
                 Record {
                     record_type: self.record_type.clone(),
                     fields,
-                    fields_dto: foreign_fields,
                 }
             })
             .collect::<Vec<Record>>();

@@ -37,15 +37,9 @@ impl RecordProvider for FileReaderRecordProvider {
             .iter()
             .map(|(k, v)| RecordGrain::new(k.to_string(), v.to_string()))
             .collect();
-        let fields_dto = fields_dto
-            .iter()
-            .map(|(k, v)| (k.to_string(), v.to_string()))
-            .collect();
-
         Record {
             record_type: "Link".to_string(),
             fields,
-            fields_dto,
         }
     }
 }

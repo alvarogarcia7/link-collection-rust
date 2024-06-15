@@ -113,7 +113,7 @@ impl RecordProvider for CliReaderRecordProvider {
         let id = Uuid::new_v4().to_string();
         let formatted_date = DateFormatter::default().format(&self.date_provider.now());
 
-        let fields_dto = vec![
+        let field_values = vec![
             ("Id".to_string(), id),
             ("Date".to_string(), formatted_date),
             (
@@ -143,14 +143,13 @@ impl RecordProvider for CliReaderRecordProvider {
 
         let mut fields: Vec<RecordGrain> = vec![];
 
-        for (key, value) in fields_dto.iter() {
+        for (key, value) in field_values.iter() {
             fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
         Record {
             record_type: "Link".to_string(),
             fields,
-            fields_dto,
         }
     }
 }
