@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct NodeView {
     pub id: u64,
     pub by: String,
@@ -50,14 +50,14 @@ pub mod tests {
 
         assert!(response.is_ok());
 
-        let response = response.unwrap();
-        assert_eq!(response.by, "vanusa");
-        assert_eq!(response.time, 1621276965);
-        assert_eq!(
-            response.title,
-            "Why Is the Gaza Strip Blurry on Google Maps?"
-        );
+        let expected = NodeView {
+            id: 27186675,
+            by: "vanusa".to_string(),
+            time: 1621276965,
+            title: "Why Is the Gaza Strip Blurry on Google Maps?".to_string(),
+            url: "https://www.bbc.com/news/57102499".to_string(),
+        };
 
-        assert_eq!(response.url, "https://www.bbc.com/news/57102499");
+        assert_eq!(response.unwrap(), expected);
     }
 }
