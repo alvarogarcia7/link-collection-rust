@@ -1,4 +1,5 @@
 pub mod interfaces;
+pub mod tags;
 
 #[derive(Debug)]
 pub struct Record {
@@ -19,3 +20,9 @@ impl RecordGrain {
         Self { key, value }
     }
 }
+
+pub struct Tags {
+    pub values: Vec<String>,
+}
+
+impl Tags {}

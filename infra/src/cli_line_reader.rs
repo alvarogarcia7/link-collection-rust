@@ -10,7 +10,7 @@ pub(crate) use domain::Record;
 use domain::RecordGrain;
 
 use crate::date::{DateFormattable, DateFormatter, DateProvidable, DateProvider};
-use crate::tags::{lowercase_separated_by_dash, split_tags};
+use domain::tags::import;
 
 pub struct CliReaderRecordProvider {
     pub line_reader: MyEditor,
@@ -134,10 +134,11 @@ impl RecordProvider for CliReaderRecordProvider {
             ),
             (
                 "Tags".to_string(),
-                lowercase_separated_by_dash(split_tags(
+                import(
                     self.line_reader
                         .read_until_ctrl_d("Tags (one per line or separated by comma)".to_string()),
-                ))
+                )
+                .values
                 .join(", "),
             ),
         ];

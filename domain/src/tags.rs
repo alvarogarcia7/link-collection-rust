@@ -1,4 +1,11 @@
-pub fn split_tags(tags: Vec<String>) -> Vec<String> {
+use crate::Tags;
+
+pub fn import(values: Vec<String>) -> Tags {
+    let tags = split_tags(values);
+    let tags = lowercase_separated_by_dash(tags);
+    Tags { values: tags }
+}
+fn split_tags(tags: Vec<String>) -> Vec<String> {
     tags.iter()
         .flat_map(|x| x.split(','))
         .map(|x| x.trim())
@@ -7,7 +14,7 @@ pub fn split_tags(tags: Vec<String>) -> Vec<String> {
         .collect::<Vec<String>>()
 }
 
-pub fn lowercase_separated_by_dash(tags: Vec<String>) -> Vec<String> {
+fn lowercase_separated_by_dash(tags: Vec<String>) -> Vec<String> {
     tags.iter()
         .map(|x| x.to_lowercase().replace(' ', "-"))
         .map(|x| x.to_string())

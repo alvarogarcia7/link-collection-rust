@@ -2,7 +2,7 @@ use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
 use domain::{Record, RecordGrain};
 
-use crate::tags::{lowercase_separated_by_dash, split_tags};
+use domain::tags::import;
 
 #[derive(Default)]
 pub struct HardcodedRecordProvider {}
@@ -28,11 +28,9 @@ impl RecordProvider for HardcodedRecordProvider {
             ),
             (
                 "Tags".to_string(),
-                lowercase_separated_by_dash(split_tags(vec![
-                    "Tag 1, tag 2".to_string(),
-                    "Another TAg".to_string(),
-                ]))
-                .join(", "),
+                import(vec!["Tag 1, tag 2".to_string(), "Another TAg".to_string()])
+                    .values
+                    .join(", "),
             ),
         ];
         let mut fields: Vec<RecordGrain> = vec![];
