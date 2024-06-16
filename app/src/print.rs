@@ -51,7 +51,9 @@ fn render_to_single_file(
 pub fn output_from_spec(spec: &str) -> io::Result<Box<dyn Write>> {
     match spec {
         "stdout" => Ok(Box::new(io::stdout())),
-        path => Ok(Box::new(fs::File::open(path)?)),
+        path => Ok(Box::new(
+            fs::OpenOptions::new().append(true).open(path).unwrap(),
+        )),
     }
 }
 

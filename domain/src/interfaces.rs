@@ -4,6 +4,10 @@ pub mod database {
     pub trait DatabaseReadAccess {
         fn read_all(self) -> Vec<Record>;
     }
+
+    pub trait DatabaseWriteAccess {
+        fn write(&self, record: Record);
+    }
 }
 
 #[derive(Debug)]

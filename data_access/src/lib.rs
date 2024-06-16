@@ -17,7 +17,7 @@ pub mod tests {
     #[ignore]
     pub fn read_file() {
         println!("{:?}", env::current_dir());
-        let file = File::open("../../data/database/links.rec").unwrap();
+        let file = File::open("./tests/data/links.rec").unwrap();
         let reader = BufReader::new(file);
 
         let records = Recfile::parse(reader).unwrap().records;

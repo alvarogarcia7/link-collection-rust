@@ -1,9 +1,11 @@
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufReader, BufWriter, Write};
+use std::path::Path;
 
 use rrecutils::Recfile;
 
-use domain::interfaces::database::DatabaseReadAccess;
+use crate::dto::to_dto;
+use domain::interfaces::database::{DatabaseReadAccess, DatabaseWriteAccess};
 use domain::{Record, RecordGrain};
 
 pub struct RecutilsDatabaseAccess<'a> {
@@ -60,5 +62,31 @@ impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
             .collect::<Vec<Record>>();
         println!("Mapped records: {:?}", mapped_records.len());
         mapped_records
+    }
+}
+
+pub struct RecutilsDatabaseWriter<'a> {
+    path: &'a Path,
+}
+
+impl<'a> RecutilsDatabaseWriter<'a> {
+    pub fn new(path: &'a Path) -> Self {
+        Self { path }
+    }
+}
+
+impl<'a> DatabaseWriteAccess for RecutilsDatabaseWriter<'a> {
+    fn write(&self, record: Record) {
+        let recfile = Recfile {
+            records: to_dto(vec![record]),
+        };
+        let file = std::fs::OpenOptions::new()
+            .append(true)
+            .open(self.path)
+            .unwrap();
+        let mut writer = BufWriter::new(file);
+        recfile.write(&mut writer).unwrap();
+        writer.flush().unwrap();
+        println!("Wrote record to database file: {:?}", self.path);
     }
 }

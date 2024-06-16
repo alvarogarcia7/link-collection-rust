@@ -6,6 +6,7 @@ use std::process::exit;
 
 // use clap::{Args, Parser, Subcommand, ValueEnum};
 use clap::{arg, Parser, Subcommand};
+use data_access::recutils_database::RecutilsDatabaseWriter;
 
 use domain::interfaces::record::RecordProvider;
 use downloader::downloader::FirebaseHackerNewsDownloader;
@@ -55,9 +56,11 @@ impl<'a> App<'a> {
                 let record_provider = Self::decide_which_provider(&from);
                 // AGB: alternative: ok_or_else
                 let mut record_provider = record_provider.ok_or(())?;
-                NewRecordUseCase::new(self.global_configuration)
-                    .run(&mut *record_provider)
-                    .map_err(|_| ())
+                NewRecordUseCase::new(RecutilsDatabaseWriter::new(
+                    self.global_configuration.database_path,
+                ))
+                .run(&mut *record_provider)
+                .map_err(|_| ())
             }
         }
     }
@@ -404,7 +407,7 @@ pub mod test_executing_commands {
     fn global_configuration_test<'a>() -> GlobalConfiguration<'a> {
         GlobalConfiguration::in_memory(
             "./tests/data/links.rec",
-            "./template/",
+            "./tests/template/",
             "cli-short.mustache".to_string(),
         )
     }
