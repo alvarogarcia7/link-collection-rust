@@ -1,6 +1,7 @@
 extern crate core;
 
 use core::str;
+use std::ffi::OsString;
 use std::path::Path;
 use std::process::exit;
 
@@ -29,6 +30,8 @@ use select::print::run;
 struct Cli {
     #[command(subcommand)]
     command: Commands,
+    #[arg(short, long, default_value = "dev")]
+    environment: String,
 }
 
 impl<'a> App<'a> {
@@ -41,8 +44,13 @@ impl<'a> App<'a> {
         match commands {
             Commands::List { file, target } => {
                 let destination_path = Path::new(&target);
+                let selected_path = file
+                    .as_ref()
+                    .map(|file| GlobalConfiguration::verify_path(file.to_str().unwrap()).unwrap())
+                    .unwrap_or(self.global_configuration.database_path);
+                println!("Reading database file at: {:?}", selected_path);
                 run(
-                    GlobalConfiguration::verify_path(&file).unwrap(),
+                    selected_path,
                     self.global_configuration.template_path,
                     self.global_configuration.template_name,
                     destination_path,
@@ -52,7 +60,8 @@ impl<'a> App<'a> {
                 Ok(())
             }
             Commands::NewRecord { from } => {
-                let record_provider = Self::decide_which_provider(&from);
+                let record_provider =
+                    Self::decide_which_provider(&self.global_configuration, &from);
                 // AGB: alternative: ok_or_else
                 let mut record_provider = record_provider.ok_or(())?;
                 NewRecordUseCase::new(RecutilsDatabaseWriter::new(
@@ -64,7 +73,10 @@ impl<'a> App<'a> {
         }
     }
 
-    fn decide_which_provider(provider_name: &String) -> Option<Box<dyn RecordProvider + 'static>> {
+    fn decide_which_provider(
+        global_configuration: &GlobalConfiguration,
+        provider_name: &String,
+    ) -> Option<Box<dyn RecordProvider + 'static>> {
         if "hardcoded" == provider_name {
             Some(Box::<HardcodedRecordProvider>::default() as Box<dyn RecordProvider>)
         } else if "cli_line_reader" == provider_name {
@@ -86,7 +98,7 @@ impl<'a> App<'a> {
             Some(Box::new(FirebaseHackerNewsImporterProvider::new(
                 MyEditor::default(),
                 DateProvider::default(),
-                FirebaseHackerNewsDownloader::new("http://0.0.0.0:8181".to_string()),
+                FirebaseHackerNewsDownloader::new(global_configuration.hackernews_api_path.clone()),
                 // FirebaseHackerNewsDownloader::new("https://hacker-news.firebaseio.com".to_string()),
                 id,
             )) as Box<dyn RecordProvider>)
@@ -101,8 +113,8 @@ impl<'a> App<'a> {
 enum Commands {
     #[command(alias = "ls", arg_required_else_help = true)]
     List {
-        file: String,
-        #[arg(default_missing_value = "stdout", default_value = "stdout")]
+        file: Option<OsString>,
+        #[option(default_missing_value = "stdout", default_value = "stdout")]
         target: String,
     },
     #[command(alias = "n")]
@@ -197,10 +209,23 @@ struct App<'a> {
 fn main() {
     let args = Cli::parse();
 
+    let (download_path, database_path) = if args.environment == "pro" {
+        (
+            "http://0.0.0.0:8181".to_string(),
+            "../link-collection/data/links.rec",
+        )
+    } else {
+        (
+            "https://hacker-news.firebaseio.com".to_string(),
+            "./data/database/links.rec",
+        )
+    };
+
     let global_configuration = GlobalConfiguration::in_memory(
-        "./data/database/links.rec",
+        database_path,
         "./data/template/",
         "cli-short.mustache".to_string(),
+        download_path,
     );
 
     App::new(global_configuration)
@@ -350,7 +375,23 @@ pub mod test_parsing_commands {
             assert_eq!(
                 actual.command,
                 Commands::List {
-                    file: "$FILE".to_string(),
+                    file: Some("$FILE".to_string()),
+                    target: "stdout".to_string()
+                }
+            );
+        }
+    }
+    #[test]
+    fn parse_the_list_subcommand_without_input_file() {
+        for subcommand in data_provider_list() {
+            let arg_vec = ["", subcommand];
+
+            let actual = Cli::parse_from(arg_vec.iter());
+
+            assert_eq!(
+                actual.command,
+                Commands::List {
+                    file: None,
                     target: "stdout".to_string()
                 }
             );
@@ -409,6 +450,7 @@ pub mod test_executing_commands {
             "./tests/data/links.rec",
             "./tests/template/",
             "cli-short.mustache".to_string(),
+            "http://0.0.0.0:8181".to_string(), // FirebaseHackerNewsDownloader::new("https://hacker-news.firebaseio.com".to_string()),
         )
     }
 
@@ -417,7 +459,7 @@ pub mod test_executing_commands {
     fn run_the_list_subcommand() {
         App::new(global_configuration_test())
             .run(Commands::List {
-                file: "tests/data/links.rec".to_string(),
+                file: Some("tests/data/links.rec".to_string()),
                 target: "/dev/null".to_string(),
             })
             .unwrap();
