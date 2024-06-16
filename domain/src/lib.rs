@@ -25,4 +25,10 @@ pub struct Tags {
     pub values: Vec<String>,
 }
 
-impl Tags {}
+impl Tags {
+    pub fn import(values: Vec<String>) -> Self {
+        let tags = tags::split_tags(values);
+        let tags = tags::lowercase_separated_by_dash(tags);
+        Tags { values: tags }
+    }
+}

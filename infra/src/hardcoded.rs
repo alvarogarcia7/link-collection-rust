@@ -1,8 +1,6 @@
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
-use domain::{Record, RecordGrain};
-
-use domain::tags::import;
+use domain::{Record, RecordGrain, Tags};
 
 #[derive(Default)]
 pub struct HardcodedRecordProvider {}
@@ -32,7 +30,7 @@ impl RecordProvider for HardcodedRecordProvider {
             ),
             (
                 "Tags".to_string(),
-                import(vec!["Tag 1, tag 2".to_string(), "Another TAg".to_string()])
+                Tags::import(vec!["Tag 1, tag 2".to_string(), "Another TAg".to_string()])
                     .values
                     .join(", "),
             ),

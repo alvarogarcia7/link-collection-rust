@@ -3,7 +3,7 @@ use uuid::Uuid;
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
 pub(crate) use domain::Record;
-use domain::RecordGrain;
+use domain::{RecordGrain, Tags};
 use downloader::downloader::{FirebaseHackerNewsDownloader, NodeView};
 
 use crate::cli_line_reader::{MyEditor, MyReadline};
@@ -75,7 +75,7 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
             ("Title".to_string(), title),
             ("Body".to_string(), body.join("\n")),
             ("Category".to_string(), category),
-            ("Tags".to_string(), tags.join(", ")),
+            ("Tags".to_string(), Tags::import(tags).values.join(",")),
         ];
 
         let mut fields: Vec<RecordGrain> = vec![];

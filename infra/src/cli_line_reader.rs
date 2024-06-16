@@ -7,10 +7,9 @@ use uuid::Uuid;
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
 pub(crate) use domain::Record;
-use domain::RecordGrain;
+use domain::{RecordGrain, Tags};
 
 use crate::date::{DateFormattable, DateFormatter, DateProvidable, DateProvider};
-use domain::tags::import;
 
 pub struct CliReaderRecordProvider {
     pub line_reader: MyEditor,
@@ -138,7 +137,7 @@ impl RecordProvider for CliReaderRecordProvider {
             ),
             (
                 "Tags".to_string(),
-                import(
+                Tags::import(
                     self.line_reader
                         .read_until_ctrl_d("Tags (one per line or separated by comma)".to_string()),
                 )
