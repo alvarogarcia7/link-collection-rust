@@ -87,6 +87,7 @@ impl<'a> App<'a> {
                 MyEditor::default(),
                 DateProvider::default(),
                 FirebaseHackerNewsDownloader::new("http://0.0.0.0:8181".to_string()),
+                // FirebaseHackerNewsDownloader::new("https://hacker-news.firebaseio.com".to_string()),
                 id,
             )) as Box<dyn RecordProvider>)
         } else {
