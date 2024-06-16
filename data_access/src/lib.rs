@@ -40,6 +40,10 @@ pub mod tests {
                 "Date".to_string(),
                 "Tue, 12 Jun 2024 10:50:21 +0000".to_string(),
             ),
+            (
+                "Link".to_string(),
+                "http://example.com/article/blog-1".to_string(),
+            ),
             ("Category".to_string(), "category1".to_string()),
             ("Title".to_string(), "Good title".to_string()),
             (
@@ -86,6 +90,7 @@ pub mod tests {
 
         let expected = "Id: a1a6925a-7958-11e8-a87f-0242ac110002
 Date: Tue, 12 Jun 2024 10:50:21 +0000
+Link: http://example.com/article/blog-1
 Category: category1
 Title: Good title
 Body: Body Line1

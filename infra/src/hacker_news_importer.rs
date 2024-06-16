@@ -60,8 +60,8 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
         let field_values = vec![
             ("Id".to_string(), id),
             ("Date".to_string(), date),
+            ("Link".to_string(), url),
             ("Title".to_string(), title),
-            ("Url".to_string(), url),
             ("Body".to_string(), body.join("\n")),
             ("Category".to_string(), category),
             ("Tags".to_string(), tags.join(", ")),

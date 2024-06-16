@@ -118,6 +118,10 @@ impl RecordProvider for CliReaderRecordProvider {
             ("Id".to_string(), id),
             ("Date".to_string(), formatted_date),
             (
+                "Link".to_string(),
+                self.line_reader.read_line("Url".to_string()),
+            ),
+            (
                 "Title".to_string(),
                 self.line_reader.read_line("Title (mandatory)".to_string()),
             ),

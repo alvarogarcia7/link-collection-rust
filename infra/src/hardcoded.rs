@@ -20,6 +20,10 @@ impl RecordProvider for HardcodedRecordProvider {
                 "Date".to_string(),
                 "Tue, 12 Jun 2024 10:50:21 +0000".to_string(),
             ),
+            (
+                "Link".to_string(),
+                "http://example.com/article/blog-1".to_string(),
+            ),
             ("Category".to_string(), "category1".to_string()),
             ("Title".to_string(), "Good title".to_string()),
             (
