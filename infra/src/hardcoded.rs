@@ -10,7 +10,7 @@ pub struct HardcodedRecordProvider {}
 impl HardcodedRecordProvider {}
 
 impl RecordProvider for HardcodedRecordProvider {
-    fn fetch(&mut self) -> Result<Record, RecordProviderError> {
+    fn fetch(&mut self) -> Result<(Record, Vec<String>), RecordProviderError> {
         let field_values = vec![
             (
                 "Id".to_string(),
@@ -43,9 +43,12 @@ impl RecordProvider for HardcodedRecordProvider {
             fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
-        Ok(Record {
-            record_type: "Link".to_string(),
-            fields,
-        })
+        Ok((
+            Record {
+                record_type: "Link".to_string(),
+                fields,
+            },
+            vec![],
+        ))
     }
 }

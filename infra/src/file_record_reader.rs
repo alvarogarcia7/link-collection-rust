@@ -18,7 +18,7 @@ impl FileReaderRecordProvider {
 }
 
 impl RecordProvider for FileReaderRecordProvider {
-    fn fetch(&mut self) -> Result<Record, RecordProviderError> {
+    fn fetch(&mut self) -> Result<(Record, Vec<String>), RecordProviderError> {
         println!(
             "Faking reading the record file with the new record: {:?}",
             self.path
@@ -38,9 +38,12 @@ impl RecordProvider for FileReaderRecordProvider {
             .iter()
             .map(|(k, v)| RecordGrain::new(k.to_string(), v.to_string()))
             .collect();
-        Ok(Record {
-            record_type: "Link".to_string(),
-            fields,
-        })
+        Ok((
+            Record {
+                record_type: "Link".to_string(),
+                fields,
+            },
+            vec![],
+        ))
     }
 }

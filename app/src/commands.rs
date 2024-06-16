@@ -47,7 +47,9 @@ impl<'a> NewRecordUseCase<'a> {
 
         let record = domain_record.unwrap();
 
-        self.database_write_access.write(record);
+        self.database_write_access.write(record.0);
+
+        self.database_write_access.commit(record.1);
 
         Ok(())
     }

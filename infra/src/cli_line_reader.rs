@@ -110,7 +110,7 @@ impl MyEditor {
 }
 
 impl RecordProvider for CliReaderRecordProvider {
-    fn fetch(&mut self) -> Result<Record, RecordProviderError> {
+    fn fetch(&mut self) -> Result<(Record, Vec<String>), RecordProviderError> {
         let id = Uuid::new_v4().to_string();
         let formatted_date = DateFormatter::default().format(&self.date_provider.now());
 
@@ -153,9 +153,12 @@ impl RecordProvider for CliReaderRecordProvider {
             fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
-        Ok(Record {
-            record_type: "Link".to_string(),
-            fields,
-        })
+        Ok((
+            Record {
+                record_type: "Link".to_string(),
+                fields,
+            },
+            vec![],
+        ))
     }
 }

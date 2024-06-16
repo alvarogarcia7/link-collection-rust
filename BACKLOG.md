@@ -48,6 +48,7 @@ fn main() {
 ### EPIC - ID:4 - Download items from HackerNews
 ### ✅STORY - ID:4.1 - Create a new stubbed HTTP server
 ### ✅STORY - ID:4.2 - Download the items from a URL
+### ✅STORY - ID:4.3 - Commit to git using the date of publishing of the hackernews item
 ### EPIC - ID:5 - Create a new wrapper on top of recutils library
 #### STORY - ID:5.1 - Create it
 #### STORY - ID:5.2 - Publish it to crates.io

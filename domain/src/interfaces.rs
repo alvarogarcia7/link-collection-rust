@@ -19,6 +19,6 @@ pub mod record {
     use crate::interfaces::RecordProviderError;
     use crate::Record;
     pub trait RecordProvider {
-        fn fetch(&mut self) -> Result<Record, RecordProviderError>;
+        fn fetch(&mut self) -> Result<(Record, Vec<String>), RecordProviderError>;
     }
 }

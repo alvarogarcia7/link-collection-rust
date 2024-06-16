@@ -35,7 +35,7 @@ impl FirebaseHackerNewsImporterProvider {
 }
 
 impl RecordProvider for FirebaseHackerNewsImporterProvider {
-    fn fetch(&mut self) -> Result<Record, RecordProviderError> {
+    fn fetch(&mut self) -> Result<(Record, Vec<String>), RecordProviderError> {
         let id = Uuid::new_v4().to_string();
         let node_view = self.downloader.get_item(self.id);
         if node_view.is_err() {
@@ -52,14 +52,25 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
 
         let date = DateFormatter::default().format(&time_);
 
-        let body = self.line_reader.read_until_ctrl_d("Body".to_string());
-        let category = self
-            .line_reader
-            .read_line("Category (mandatory)".to_string());
-        tags.append(&mut self.line_reader.read_until_ctrl_d("Tags".to_string()));
+        const FAKE: bool = false;
+
+        let (body, category, tags) = if FAKE {
+            let body = vec!["FAKE BODY".to_string()];
+            let category = "FAKE CATEGORY".to_string();
+            let tags = vec!["FAKE".to_string()];
+            (body, category, tags)
+        } else {
+            let body = self.line_reader.read_until_ctrl_d("Body".to_string());
+            let category = self
+                .line_reader
+                .read_line("Category (mandatory)".to_string());
+            tags.append(&mut self.line_reader.read_until_ctrl_d("Tags".to_string()));
+            (body, category, tags)
+        };
+
         let field_values = vec![
             ("Id".to_string(), id),
-            ("Date".to_string(), date),
+            ("Date".to_string(), date.clone()),
             ("Link".to_string(), url),
             ("Title".to_string(), title),
             ("Body".to_string(), body.join("\n")),
@@ -75,9 +86,12 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
 
         println!("{:?}", fields);
 
-        Ok(Record {
-            record_type: "Link".to_string(),
-            fields,
-        })
+        Ok((
+            Record {
+                record_type: "Link".to_string(),
+                fields,
+            },
+            vec![format!("VARIABLE;DATE;{}", date)],
+        ))
     }
 }
