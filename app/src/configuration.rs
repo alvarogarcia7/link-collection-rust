@@ -7,6 +7,7 @@ pub struct GlobalConfiguration<'a> {
     pub database_path: &'a Path,
     pub template_path: &'a Path,
     pub template_name: String,
+    pub hackernews_api_path: String,
 }
 
 impl<'a> GlobalConfiguration<'a> {
@@ -23,11 +24,13 @@ impl<'a> GlobalConfiguration<'a> {
         database_path: &'a str,
         template_path: &'a str,
         template_name: String,
+        hackernews_api_path: String,
     ) -> Self {
         Self {
             database_path: GlobalConfiguration::verify_path(database_path).unwrap(),
             template_path: GlobalConfiguration::verify_path(template_path).unwrap(),
             template_name,
+            hackernews_api_path,
         }
     }
 }

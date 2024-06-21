@@ -5,7 +5,7 @@ use std::path::Path;
 use std::process::exit;
 
 // use clap::{Args, Parser, Subcommand, ValueEnum};
-use clap::{arg, Parser, Subcommand};
+use clap::{arg, Args, Parser, Subcommand};
 use data_access::recutils_database::RecutilsDatabaseWriter;
 
 use domain::interfaces::record::RecordProvider;
@@ -29,6 +29,8 @@ use select::print::run;
 struct Cli {
     #[command(subcommand)]
     command: Commands,
+    #[arg(short, long, default_value = "dev")]
+    environment: String,
 }
 
 impl<'a> App<'a> {
@@ -39,10 +41,10 @@ impl<'a> App<'a> {
     }
     fn run(self, commands: Commands) -> Result<(), ()> {
         match commands {
-            Commands::List { file, target } => {
-                let destination_path = Path::new(&target);
+            Commands::List(list_args) => {
+                let destination_path = Path::new(&list_args.file);
                 run(
-                    GlobalConfiguration::verify_path(&file).unwrap(),
+                    GlobalConfiguration::verify_path(&list_args.file).unwrap(),
                     self.global_configuration.template_path,
                     self.global_configuration.template_name,
                     destination_path,
@@ -52,7 +54,8 @@ impl<'a> App<'a> {
                 Ok(())
             }
             Commands::NewRecord { from } => {
-                let record_provider = Self::decide_which_provider(&from);
+                let record_provider =
+                    Self::decide_which_provider(&self.global_configuration, &from);
                 // AGB: alternative: ok_or_else
                 let mut record_provider = record_provider.ok_or(())?;
                 NewRecordUseCase::new(RecutilsDatabaseWriter::new(
@@ -64,7 +67,10 @@ impl<'a> App<'a> {
         }
     }
 
-    fn decide_which_provider(provider_name: &String) -> Option<Box<dyn RecordProvider + 'static>> {
+    fn decide_which_provider(
+        global_configuration: &GlobalConfiguration,
+        provider_name: &String,
+    ) -> Option<Box<dyn RecordProvider + 'static>> {
         if "hardcoded" == provider_name {
             Some(Box::<HardcodedRecordProvider>::default() as Box<dyn RecordProvider>)
         } else if "cli_line_reader" == provider_name {
@@ -86,7 +92,7 @@ impl<'a> App<'a> {
             Some(Box::new(FirebaseHackerNewsImporterProvider::new(
                 MyEditor::default(),
                 DateProvider::default(),
-                FirebaseHackerNewsDownloader::new("http://0.0.0.0:8181".to_string()),
+                FirebaseHackerNewsDownloader::new(global_configuration.hackernews_api_path.clone()),
                 // FirebaseHackerNewsDownloader::new("https://hacker-news.firebaseio.com".to_string()),
                 id,
             )) as Box<dyn RecordProvider>)
@@ -97,14 +103,39 @@ impl<'a> App<'a> {
     }
 }
 
+#[derive(Debug, Args, PartialEq)]
+#[command(args_conflicts_with_subcommands = true)]
+#[command(flatten_help = true)]
+struct ListArgs {
+    // #[command(subcommand)]
+    // command: Option<StashCommands>,
+    //
+    // #[command(flatten)]
+    // push: StashPushArgs,
+    #[arg(short, long)]
+    file: String,
+
+    #[arg(short, long)]
+    target: String,
+}
+
+#[derive(Debug, Subcommand, PartialEq)]
+enum StashCommands {
+    Push(StashPushArgs),
+    Pop { stash: Option<String> },
+    Apply { stash: Option<String> },
+}
+
+#[derive(Debug, Args, PartialEq)]
+struct StashPushArgs {
+    #[arg(short, long)]
+    message: Option<String>,
+}
+
 #[derive(Debug, Subcommand, PartialEq)]
 enum Commands {
     #[command(alias = "ls", arg_required_else_help = true)]
-    List {
-        file: String,
-        #[arg(default_missing_value = "stdout", default_value = "stdout")]
-        target: String,
-    },
+    List(ListArgs),
     #[command(alias = "n")]
     NewRecord {
         #[arg(
@@ -197,10 +228,23 @@ struct App<'a> {
 fn main() {
     let args = Cli::parse();
 
+    let (download_path, database_path) = if args.environment == "pro" {
+        (
+            "http://0.0.0.0:8181".to_string(),
+            "../link-collection/data/links.rec",
+        )
+    } else {
+        (
+            "https://hacker-news.firebaseio.com".to_string(),
+            "./data/database/links.rec",
+        )
+    };
+
     let global_configuration = GlobalConfiguration::in_memory(
-        "./data/database/links.rec",
+        database_path,
         "./data/template/",
         "cli-short.mustache".to_string(),
+        download_path,
     );
 
     App::new(global_configuration)
@@ -334,7 +378,7 @@ fn main() {
 pub mod test_parsing_commands {
     use clap::Parser;
 
-    use crate::{Cli, Commands};
+    use crate::{Cli, Commands, ListArgs};
 
     fn data_provider_list() -> Vec<&'static str> {
         vec!["list", "ls"]
@@ -343,16 +387,16 @@ pub mod test_parsing_commands {
     #[test]
     fn parse_the_list_subcommand_with_any_variant() {
         for subcommand in data_provider_list() {
-            let arg_vec = ["", subcommand, "$FILE"];
+            let arg_vec = ["", subcommand, "--file", "$FILE", "--target", "stdout"];
 
             let actual = Cli::parse_from(arg_vec.iter());
 
             assert_eq!(
                 actual.command,
-                Commands::List {
+                Commands::List(ListArgs {
                     file: "$FILE".to_string(),
                     target: "stdout".to_string()
-                }
+                })
             );
         }
     }
@@ -409,6 +453,7 @@ pub mod test_executing_commands {
             "./tests/data/links.rec",
             "./tests/template/",
             "cli-short.mustache".to_string(),
+            "http://0.0.0.0:8181".to_string(),
         )
     }
 
@@ -416,10 +461,10 @@ pub mod test_executing_commands {
     #[ignore] // This test uses the filesystem
     fn run_the_list_subcommand() {
         App::new(global_configuration_test())
-            .run(Commands::List {
+            .run(Commands::List(ListArgs {
                 file: "tests/data/links.rec".to_string(),
                 target: "/dev/null".to_string(),
-            })
+            }))
             .unwrap();
     }
 
