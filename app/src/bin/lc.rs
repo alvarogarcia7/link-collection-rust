@@ -6,8 +6,8 @@ use std::process::exit;
 
 // use clap::{Args, Parser, Subcommand, ValueEnum};
 use clap::{arg, Args, Parser, Subcommand};
-use data_access::recutils_database::RecutilsDatabaseWriter;
 
+use data_access::recutils_database::RecutilsDatabaseWriter;
 use domain::interfaces::record::RecordProvider;
 use downloader::downloader::FirebaseHackerNewsDownloader;
 use infra::cli_line_reader::{CliReaderRecordProvider, MyEditor};
@@ -24,29 +24,40 @@ use select::print::run;
 // Source: https://docs.rs/clap/latest/clap/_derive/_cookbook/git_derive/index.html
 
 /// A fictional versioning CLI
-#[derive(Debug, Parser)] // requires `derive` feature
+#[derive(Debug, Parser, PartialEq)] // requires `derive` feature
 #[command(name = "lc")]
 struct Cli {
+    #[arg(short, long)]
+    file: Option<String>,
     #[command(subcommand)]
     command: Commands,
     #[arg(short, long, default_value = "dev")]
     environment: String,
 }
 
+#[derive(Debug)]
+pub struct AppOptions<'a> {
+    pub commands: Commands,
+    pub database_path: &'a Path,
+    pub template_path: &'a Path,
+    pub template_name: String,
+    pub hackernews_api_path: String,
+}
+
 impl<'a> App<'a> {
-    fn new(global_configuration: GlobalConfiguration<'a>) -> Self {
-        Self {
-            global_configuration,
-        }
+    fn new(app_options: AppOptions<'a>) -> Self {
+        Self { app_options }
     }
-    fn run(self, commands: Commands) -> Result<(), ()> {
+    fn run(self) -> Result<(), ()> {
+        let commands = self.app_options.commands;
         match commands {
             Commands::List(list_args) => {
-                let destination_path = Path::new(&list_args.file);
+                let string = list_args.target.unwrap_or("stdout".to_string());
+                let destination_path = Path::new(&string);
                 run(
-                    GlobalConfiguration::verify_path(&list_args.file).unwrap(),
-                    self.global_configuration.template_path,
-                    self.global_configuration.template_name,
+                    self.app_options.database_path,
+                    self.app_options.template_path,
+                    self.app_options.template_name,
                     destination_path,
                 )
                 .unwrap();
@@ -55,20 +66,18 @@ impl<'a> App<'a> {
             }
             Commands::NewRecord { from } => {
                 let record_provider =
-                    Self::decide_which_provider(&self.global_configuration, &from);
+                    Self::decide_which_provider(self.app_options.hackernews_api_path, &from);
                 // AGB: alternative: ok_or_else
                 let mut record_provider = record_provider.ok_or(())?;
-                NewRecordUseCase::new(RecutilsDatabaseWriter::new(
-                    self.global_configuration.database_path,
-                ))
-                .run(&mut *record_provider)
-                .map_err(|_| ())
+                NewRecordUseCase::new(RecutilsDatabaseWriter::new(self.app_options.database_path))
+                    .run(&mut *record_provider)
+                    .map_err(|_| ())
             }
         }
     }
 
     fn decide_which_provider(
-        global_configuration: &GlobalConfiguration,
+        hacker_news_path: String,
         provider_name: &String,
     ) -> Option<Box<dyn RecordProvider + 'static>> {
         if "hardcoded" == provider_name {
@@ -92,7 +101,7 @@ impl<'a> App<'a> {
             Some(Box::new(FirebaseHackerNewsImporterProvider::new(
                 MyEditor::default(),
                 DateProvider::default(),
-                FirebaseHackerNewsDownloader::new(global_configuration.hackernews_api_path.clone()),
+                FirebaseHackerNewsDownloader::new(hacker_news_path),
                 // FirebaseHackerNewsDownloader::new("https://hacker-news.firebaseio.com".to_string()),
                 id,
             )) as Box<dyn RecordProvider>)
@@ -104,19 +113,18 @@ impl<'a> App<'a> {
 }
 
 #[derive(Debug, Args, PartialEq)]
-#[command(args_conflicts_with_subcommands = true)]
-#[command(flatten_help = true)]
-struct ListArgs {
+// #[command(args_conflicts_with_subcommands = true)]
+// #[command(flatten_help = true)]
+pub struct ListArgs {
     // #[command(subcommand)]
     // command: Option<StashCommands>,
     //
     // #[command(flatten)]
     // push: StashPushArgs,
+    // #[arg(short, long)]
+    // file: Option<String>,
     #[arg(short, long)]
-    file: String,
-
-    #[arg(short, long)]
-    target: String,
+    target: Option<String>,
 }
 
 #[derive(Debug, Subcommand, PartialEq)]
@@ -133,8 +141,8 @@ struct StashPushArgs {
 }
 
 #[derive(Debug, Subcommand, PartialEq)]
-enum Commands {
-    #[command(alias = "ls", arg_required_else_help = true)]
+pub enum Commands {
+    #[command(alias = "ls")]
     List(ListArgs),
     #[command(alias = "n")]
     NewRecord {
@@ -222,7 +230,23 @@ enum Commands {
 // }
 
 struct App<'a> {
-    global_configuration: GlobalConfiguration<'a>,
+    app_options: AppOptions<'a>,
+}
+
+impl<'a> App<'a> {
+    pub(crate) fn parse_args<'b>(
+        commands: Commands,
+        global_configuration: GlobalConfiguration<'b>,
+        database_path: &'b Path,
+    ) -> AppOptions<'b> {
+        AppOptions {
+            commands,
+            database_path,
+            template_path: global_configuration.template_path,
+            template_name: global_configuration.template_name,
+            hackernews_api_path: global_configuration.hackernews_api_path,
+        }
+    }
 }
 
 fn main() {
@@ -231,24 +255,34 @@ fn main() {
     let (download_path, database_path) = if args.environment == "pro" {
         (
             "http://0.0.0.0:8181".to_string(),
-            "../link-collection/data/links.rec",
+            "../link-collection/data/links.rec".to_string(),
         )
     } else {
         (
             "https://hacker-news.firebaseio.com".to_string(),
-            "./data/database/links.rec",
+            "./data/database/links.rec".to_string(),
         )
     };
 
     let global_configuration = GlobalConfiguration::in_memory(
-        database_path,
+        &database_path,
         "./data/template/",
         "cli-short.mustache".to_string(),
         download_path,
     );
 
-    App::new(global_configuration)
-        .run(args.command)
+    let string = args.file.unwrap_or(
+        global_configuration
+            .database_path
+            .to_str()
+            .unwrap()
+            .to_string(),
+    );
+    let value = string.as_str();
+    let path = GlobalConfiguration::verify_path(value).unwrap();
+
+    App::new(App::parse_args(args.command, global_configuration, path))
+        .run()
         .map(|_| exit(0))
         .map_err(|_| exit(1))
         .unwrap();
@@ -387,18 +421,39 @@ pub mod test_parsing_commands {
     #[test]
     fn parse_the_list_subcommand_with_any_variant() {
         for subcommand in data_provider_list() {
-            let arg_vec = ["", subcommand, "--file", "$FILE", "--target", "stdout"];
+            let arg_vec = ["", "--file", "$FILE", subcommand, "--target", "stdout"];
 
             let actual = Cli::parse_from(arg_vec.iter());
 
             assert_eq!(
-                actual.command,
-                Commands::List(ListArgs {
-                    file: "$FILE".to_string(),
-                    target: "stdout".to_string()
-                })
+                actual,
+                Cli {
+                    environment: "dev".to_string(),
+                    file: Some("$FILE".to_string()),
+                    command: Commands::List(ListArgs {
+                        target: Some("stdout".to_string())
+                    })
+                }
             );
         }
+    }
+
+    #[test]
+    fn parse_the_list_subcommand_without_file_args() {
+        let arg_vec = ["", "list", "--target", "stdout"];
+
+        let actual = Cli::parse_from(arg_vec.iter());
+
+        assert_eq!(
+            actual,
+            Cli {
+                environment: "dev".to_string(),
+                file: None,
+                command: Commands::List(ListArgs {
+                    target: Some("stdout".to_string())
+                })
+            }
+        );
     }
 
     #[test]
@@ -442,6 +497,35 @@ pub mod test_parsing_commands {
             }
         );
     }
+
+    #[test]
+    fn parse_the_list_without_file() {
+        let arg_vec = ["", "list", "--target", "stdout"];
+
+        let actual = Cli::parse_from(arg_vec.iter());
+
+        assert_eq!(
+            actual.command,
+            Commands::List(ListArgs {
+                target: Some("stdout".to_string())
+            })
+        );
+    }
+    #[test]
+    fn parse_the_list_without_both() {
+        let arg_vec = ["", "list"];
+
+        let actual = Cli::parse_from(arg_vec.iter());
+
+        assert_eq!(
+            actual,
+            Cli {
+                file: None,
+                command: Commands::List(ListArgs { target: None }),
+                environment: "dev".to_string()
+            }
+        );
+    }
 }
 
 #[cfg(test)]
@@ -457,24 +541,29 @@ pub mod test_executing_commands {
         )
     }
 
-    #[test]
-    #[ignore] // This test uses the filesystem
-    fn run_the_list_subcommand() {
-        App::new(global_configuration_test())
-            .run(Commands::List(ListArgs {
-                file: "tests/data/links.rec".to_string(),
-                target: "/dev/null".to_string(),
-            }))
-            .unwrap();
-    }
+    // #[test]
+    // #[ignore] // This test uses the filesystem
+    // fn run_the_list_subcommand() {
+    //     App::new(global_configuration_test())
+    //         .run(Commands::List(ListArgs {
+    //             file: "tests/data/links.rec".to_string(),
+    //             target: "/dev/null".to_string(),
+    //         }))
+    //         .unwrap();
+    // }
 
     #[test]
     #[ignore]
     fn run_the_newrecord_subcommand_from_hardcoded() {
         assert_eq!(
-            App::new(global_configuration_test()).run(Commands::NewRecord {
-                from: "hardcoded".to_string(),
-            }),
+            App::new(App::parse_args(
+                Commands::NewRecord {
+                    from: "hardcoded".to_string(),
+                },
+                global_configuration_test(),
+                global_configuration_test().database_path
+            ))
+            .run(),
             Ok(())
         );
     }
@@ -483,9 +572,14 @@ pub mod test_executing_commands {
     #[ignore] // This test uses the filesystem
     fn run_the_newrecord_subcommand_from_file() {
         assert_eq!(
-            App::new(global_configuration_test()).run(Commands::NewRecord {
-                from: "./tests/data/new-record-1.txt".to_string(),
-            }),
+            App::new(App::parse_args(
+                Commands::NewRecord {
+                    from: "./tests/data/new-record-1.txt".to_string(),
+                },
+                global_configuration_test(),
+                global_configuration_test().database_path
+            ))
+            .run(),
             Ok(())
         );
     }

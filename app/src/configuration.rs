@@ -11,6 +11,16 @@ pub struct GlobalConfiguration<'a> {
 }
 
 impl<'a> GlobalConfiguration<'a> {
+    // pub fn verify_path(raw_value: &'a str) -> Option<&'a Path> {
+    //     let path = Path::new(raw_value);
+    //     if !path.exists() {
+    //         eprintln!("PWD: {:?}", env::current_dir());
+    //         eprintln!("This path does not exist: {:?}", path);
+    //         return None;
+    //     }
+    //     let option: Option<&'a Path> = Some(path);
+    //     option
+    // }
     pub fn verify_path(raw_value: &str) -> Option<&Path> {
         let path = Path::new(raw_value);
         if !path.exists() {
