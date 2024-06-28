@@ -70,3 +70,21 @@ Body: Body Line1
 +LONG LONG LONG 
 Tags: tag-1, tag-2, another-tag
 
+Id: a1a6925a-7958-11e8-a87f-0242ac110002
+Date: Tue, 12 Jun 2024 10:50:21 +0000
+Link: http://example.com/article/blog-1
+Category: category1
+Title: Good title
+Body: Body Line1
++Body line 2
++LONG LONG LONG 
+Tags: tag-1, tag-2, another-tag
+
+Body: Body Line1
++Body line 2
+Date: Tue, 26 Jun 2018 15:50:21 +0000
+Tags: tag1, tag_2, name-surname
+Id: a1a6925a-7958-11e8-a87f-0242ac110002
+Category: category1
+Title: Good title
+
