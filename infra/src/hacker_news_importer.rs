@@ -16,8 +16,6 @@ pub struct FirebaseHackerNewsImporterProvider {
     id: u64,
 }
 
-impl FirebaseHackerNewsImporterProvider {}
-
 impl FirebaseHackerNewsImporterProvider {
     pub fn new(
         line_reader: MyEditor,
