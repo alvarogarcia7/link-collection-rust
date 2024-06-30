@@ -254,12 +254,12 @@ fn main() {
 
     let (download_path, database_path) = if args.environment == "pro" {
         (
-            "http://0.0.0.0:8181".to_string(),
+            "https://hacker-news.firebaseio.com".to_string(),
             "../link-collection/data/links.rec".to_string(),
         )
     } else {
         (
-            "https://hacker-news.firebaseio.com".to_string(),
+            "http://0.0.0.0:8181".to_string(),
             "./data/database/links.rec".to_string(),
         )
     };
