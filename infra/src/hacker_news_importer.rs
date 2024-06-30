@@ -73,7 +73,7 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
             ("Title".to_string(), title),
             ("Body".to_string(), body.join("\n")),
             ("Category".to_string(), category),
-            ("Tags".to_string(), Tags::import(tags).values.join(",")),
+            ("Tags".to_string(), Tags::import(tags).values.join(", ")),
         ];
 
         let mut fields: Vec<RecordGrain> = vec![];
