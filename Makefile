@@ -38,3 +38,11 @@ up:
 
 down:
 	docker compose down
+
+build:
+	cargo build
+.PHONY: build
+
+build-release:
+	cargo build --release
+.PHONY: build-release
