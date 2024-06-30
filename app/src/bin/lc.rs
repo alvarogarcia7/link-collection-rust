@@ -106,8 +106,14 @@ impl<'a> App<'a> {
                 id,
             )) as Box<dyn RecordProvider>)
         } else {
-            let record_file = GlobalConfiguration::verify_path(provider_name)?;
-            Some(Box::new(FileReaderRecordProvider::new(record_file)) as Box<dyn RecordProvider>)
+            let record_file = GlobalConfiguration::verify_path(provider_name);
+            if record_file.is_some() {
+                Some(Box::new(FileReaderRecordProvider::new(record_file?))
+                    as Box<dyn RecordProvider>)
+            } else {
+                println!("File not found at: {:?}. Aborting.", provider_name);
+                None
+            }
         }
     }
 }
