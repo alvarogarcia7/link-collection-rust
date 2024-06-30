@@ -10,6 +10,12 @@ pub struct NodeView {
     pub url: String,
 }
 
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct ResponseView {
+    pub node_view: NodeView,
+    pub origin: String,
+}
+
 impl NodeView {
     pub fn time(&self) -> DateTime<FixedOffset> {
         DateTime::<FixedOffset>::from(
@@ -27,7 +33,7 @@ impl FirebaseHackerNewsDownloader {
         FirebaseHackerNewsDownloader { domain }
     }
 
-    pub fn get_item(&self, id: u64) -> Result<NodeView, reqwest::Error> {
+    pub fn get_item(&self, id: u64) -> Result<ResponseView, reqwest::Error> {
         let response = reqwest::blocking::Client::new();
         let path = format!("{}/v0/item/{}.json", self.domain, id);
         let response = response
@@ -44,7 +50,10 @@ impl FirebaseHackerNewsDownloader {
             );
             return Err(error);
         }
-        response.json::<NodeView>()
+        response.json::<NodeView>().map(|node_view| ResponseView {
+            node_view,
+            origin: format!("https://news.ycombinator.com/item?id={}", id),
+        })
     }
 }
 
@@ -58,7 +67,7 @@ impl Default for FirebaseHackerNewsDownloader {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::downloader::{FirebaseHackerNewsDownloader, NodeView};
+    use crate::downloader::{FirebaseHackerNewsDownloader, NodeView, ResponseView};
 
     #[test]
     fn fetch_and_parse_the_fields() {
@@ -68,12 +77,15 @@ pub mod tests {
 
         assert!(response.is_ok());
 
-        let expected = NodeView {
-            id: 27186675,
-            by: "vanusa".to_string(),
-            time: 1621276965,
-            title: "Why Is the Gaza Strip Blurry on Google Maps?".to_string(),
-            url: "https://www.bbc.com/news/57102499".to_string(),
+        let expected = ResponseView {
+            node_view: NodeView {
+                id: 27186675,
+                by: "vanusa".to_string(),
+                time: 1621276965,
+                title: "Why Is the Gaza Strip Blurry on Google Maps?".to_string(),
+                url: "https://www.bbc.com/news/57102499".to_string(),
+            },
+            origin: "https://news.ycombinator.com/item?id=12339182329".to_string(),
         };
 
         assert_eq!(response.unwrap(), expected);

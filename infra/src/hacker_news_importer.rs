@@ -35,16 +35,16 @@ impl FirebaseHackerNewsImporterProvider {
 impl RecordProvider for FirebaseHackerNewsImporterProvider {
     fn fetch(&mut self) -> Result<(Record, Vec<String>), RecordProviderError> {
         let id = Uuid::new_v4().to_string();
-        let node_view = self.downloader.get_item(self.id);
-        if node_view.is_err() {
+        let response_view = self.downloader.get_item(self.id);
+        if response_view.is_err() {
             return Err(RecordProviderError::ErrorFetchingRecord);
         }
 
         let mut tags: Vec<String> = Vec::with_capacity(6);
         tags.append(&mut vec!["hackernews".to_string(), "imported".to_string()]);
-        let view_unwrapped = node_view.unwrap();
-        let time_ = view_unwrapped.time();
-        let NodeView { by, title, url, .. } = view_unwrapped;
+        let view_unwrapped = response_view.unwrap();
+        let time_ = view_unwrapped.node_view.time();
+        let NodeView { by, title, url, .. } = view_unwrapped.node_view;
 
         tags.push(by);
 
@@ -74,6 +74,7 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
             ("Body".to_string(), body.join("\n")),
             ("Category".to_string(), category),
             ("Tags".to_string(), Tags::import(tags).values.join(", ")),
+            ("Origin".to_string(), view_unwrapped.origin),
         ];
 
         let mut fields: Vec<RecordGrain> = vec![];
