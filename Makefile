@@ -53,5 +53,5 @@ LC:=cargo run --bin lc --
 PRO:=--environment pro
 
 import: build
-	${LC} ${PRO} new-record import:$(filter-out $@,$(MAKECMDGOALS))
+	$(LC) $(PRO) new-record import:$(filter-out $@,$(MAKECMDGOALS))
 .PHONY: import
