@@ -49,9 +49,13 @@ build-release:
 
 %: ;
 
-LC:=cargo run --bin lc --
+LC:=cargo run --release --bin lc --
 PRO:=--environment pro
 
-import: build
+import: build-release
 	$(LC) $(PRO) new-record import:$(filter-out $@,$(MAKECMDGOALS))
 .PHONY: import
+
+add: build-release
+	$(LC) $(PRO) new-record
+.PHONY: add
