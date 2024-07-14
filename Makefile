@@ -47,13 +47,12 @@ build-release:
 	cargo build --release
 .PHONY: build-release
 
-%: ;
-
 LC:=cargo run --release --bin lc --
 PRO:=--environment pro
 
 import: build-release
-	$(LC) $(PRO) new-record import:$(filter-out $@,$(MAKECMDGOALS))
+	@if [ -z "$(hn)" ]; then echo "`hn` is not set. use make ... hn=..."; exit 1; fi
+	$(LC) $(PRO) new-record import:$(hn)
 .PHONY: import
 
 add: build-release
