@@ -24,7 +24,7 @@ impl RecordProvider for FileReaderRecordProvider {
             self.path
         );
 
-        let body = ["Body Line1", "Body line 2"].join("\n+");
+        let body = ["Body Line1", "Body line 2"].join("\n+ ");
         let fields_dto: HashMap<&str, &str> = HashMap::from([
             ("Id", "a1a6925a-7958-11e8-a87f-0242ac110002"),
             ("Date", "Tue, 26 Jun 2018 15:50:21 +0000"),

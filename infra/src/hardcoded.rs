@@ -26,7 +26,7 @@ impl RecordProvider for HardcodedRecordProvider {
             ("Title".to_string(), "Good title".to_string()),
             (
                 "Body".to_string(),
-                ["Body Line1", "Body line 2", "LONG LONG LONG "].join("\n+"),
+                ["Body Line1", "Body line 2", "LONG LONG LONG "].join("\n+ "),
             ),
             (
                 "Tags".to_string(),

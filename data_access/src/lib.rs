@@ -48,7 +48,7 @@ pub mod tests {
             ("Title".to_string(), "Good title".to_string()),
             (
                 "Body".to_string(),
-                ["Body Line1", "Body line 2", "LONG LONG LONG"].join("\n+"),
+                ["Body Line1", "Body line 2", "LONG LONG LONG"].join("\n+ "),
             ),
             ("Tags".to_string(), "tag1, tag_2, name-surname".to_string()),
         ];
@@ -94,8 +94,8 @@ Link: http://example.com/article/blog-1
 Category: category1
 Title: Good title
 Body: Body Line1
-+Body line 2
-+LONG LONG LONG
++ Body line 2
++ LONG LONG LONG
 Tags: tag1, tag_2, name-surname
 
 ";
