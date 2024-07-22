@@ -75,7 +75,7 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
         }
         field_values.append(&mut vec![
             ("Title".to_string(), title),
-            ("Body".to_string(), body.join("\n")),
+            ("Body".to_string(), body.join("\n+")),
             ("Category".to_string(), category),
             ("Tags".to_string(), Tags::import(tags).values.join(", ")),
             ("Origin".to_string(), view_unwrapped.origin),
