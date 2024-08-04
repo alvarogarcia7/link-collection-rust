@@ -43,9 +43,33 @@ impl Default for MyEditor {
     }
 }
 
+impl MyEditor {
+    pub fn handle(
+        &mut self,
+        readline: Result<String, ReadlineError>,
+    ) -> Result<String, ReadlineError> {
+        match readline {
+            Ok(line) => Ok(line),
+            Err(ReadlineError::Interrupted) => {
+                println!("CTRL-C");
+                readline
+            }
+            Err(ReadlineError::Eof) => {
+                println!("CTRL-D");
+                readline
+            }
+            Err(err) => {
+                println!("Error: {:?}", err);
+                Err(err)
+            }
+        }
+    }
+}
+
 pub trait MyReadline {
     fn read_until_ctrl_d(&mut self, query: String) -> Vec<String>;
     fn read_line(&mut self, query: String) -> String;
+    fn read_line_with_initial(&mut self, query: String, initial: (&str, &str)) -> String;
 }
 
 impl MyReadline for MyEditor {
@@ -79,21 +103,18 @@ impl MyReadline for MyEditor {
         self.print_prompt(&format!("Type '{}' (Enter to finish)", query));
         loop {
             let readline = self.read_line_raw(">> ");
-            match readline {
-                Ok(line_value) => {
-                    // println!("Line: {}", line_value);
-                    return line_value.trim().to_string();
-                }
-                Err(ReadlineError::Interrupted) => {
-                    println!("CTRL-C");
-                }
-                Err(ReadlineError::Eof) => {
-                    println!("CTRL-D");
-                }
-                Err(err) => {
-                    println!("Error: {:?}", err);
-                }
+            if let Ok(line_value) = self.handle(readline) {
+                return line_value;
             }
+        }
+    }
+    fn read_line_with_initial(&mut self, query: String, initial: (&str, &str)) -> String {
+        self.print_prompt(&format!("Type '{}' (Enter to finish)", query));
+        loop {
+            let readline = self.read_line_raw_with_initial(">> ", initial);
+            if let Ok(line_value) = self.handle(readline) {
+                return line_value.trim().to_string();
+            };
         }
     }
 }
@@ -105,6 +126,14 @@ impl MyEditor {
 
     fn read_line_raw(&mut self, prompt: &str) -> Result<String, ReadlineError> {
         self.rl.readline(prompt)
+    }
+
+    fn read_line_raw_with_initial(
+        &mut self,
+        prompt: &str,
+        initial: (&str, &str),
+    ) -> Result<String, ReadlineError> {
+        self.rl.readline_with_initial(prompt, initial)
     }
 }
 

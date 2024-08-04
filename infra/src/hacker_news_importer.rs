@@ -64,7 +64,7 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
             let body = self.line_reader.read_until_ctrl_d("Body".to_string());
             let category = self
                 .line_reader
-                .read_line("Category (mandatory)".to_string());
+                .read_line_with_initial("Category (mandatory)".to_string(), ("craftsmanship", ""));
             tags.append(&mut self.line_reader.read_until_ctrl_d("Tags".to_string()));
             (body, category, tags)
         };
