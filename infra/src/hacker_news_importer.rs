@@ -50,6 +50,9 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
 
         let date = DateFormatter::default().format(&time_);
 
+        println!("Title: {:?}", title);
+        println!("time: {:?}", time_);
+
         const FAKE: bool = false;
 
         let (body, category, tags) = if FAKE {
