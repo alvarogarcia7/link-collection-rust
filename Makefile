@@ -58,3 +58,7 @@ import: build-release
 add: build-release
 	$(LC) $(PRO) new-record
 .PHONY: add
+
+sync:
+	make -C ~/Documents/project/link-collection sync
+.PHONY: sync
