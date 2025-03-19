@@ -88,16 +88,25 @@ impl<'a> App<'a> {
                 DateProvider::default(),
             )) as Box<dyn RecordProvider>)
         } else if provider_name.starts_with("import") {
-            let maybe_id: Vec<&str> = provider_name.split(':').collect();
-            let id = maybe_id[1].parse::<u64>();
-            if id.is_err() {
+            let id_string = if provider_name.contains('=') {
+                provider_name.split('=').last().unwrap().to_string()
+            } else {
+                let maybe_id: Vec<&str> = provider_name.split(':').collect();
+                maybe_id[1].to_string()
+            };
+            if !id_string.chars().all(char::is_numeric) {
+                println!("[ImportNotNumeric] The import command should have the format: import:1234: {id_string}");
+                return None;
+            }
+            let id_x = id_string.parse::<u64>();
+            if id_x.is_err() {
                 print!(
                     "Couldn't parse the number {:?}. Full string: {:?}",
-                    maybe_id[1], provider_name
+                    id_string, provider_name
                 );
                 return None;
             }
-            let id = id.unwrap();
+            let id: u64 = id_x.unwrap();
             Some(Box::new(FirebaseHackerNewsImporterProvider::new(
                 MyEditor::default(),
                 DateProvider::default(),
