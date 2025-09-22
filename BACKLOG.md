@@ -40,6 +40,7 @@ fn main() {
 ### STORY - ID:6.2 - Add a logger
 ### ✅STORY - ID:6.3 - Add a configuration so the values are not repeated
 ### STORY - ID:6.4 - Read the configuration from a file
+### STORY - ID:6.5 - List the tags from the database
 ### EPIC - ID:2 - Add a new record to the database
 ### ✅STORY - ID:2.1 - From the CLI
 ### 🚧STORY - ID:2.2 - From a (temporary) file
