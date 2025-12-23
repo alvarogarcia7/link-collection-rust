@@ -3,6 +3,7 @@ use domain::interfaces::RecordProviderError;
 use domain::{Record, RecordGrain};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use log::info;
 
 pub struct FileReaderRecordProvider {
     path: PathBuf,
@@ -19,7 +20,7 @@ impl FileReaderRecordProvider {
 
 impl RecordProvider for FileReaderRecordProvider {
     fn fetch(&mut self) -> Result<(Record, Vec<String>), RecordProviderError> {
-        println!(
+        info!(
             "Faking reading the record file with the new record: {:?}",
             self.path
         );

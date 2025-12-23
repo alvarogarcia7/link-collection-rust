@@ -3,6 +3,7 @@ use rustyline::error::ReadlineError;
 use rustyline::history::FileHistory;
 use rustyline::{DefaultEditor, EditMode, Editor};
 use uuid::Uuid;
+use log::{info, warn};
 
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
@@ -51,15 +52,15 @@ impl MyEditor {
         match readline {
             Ok(line) => Ok(line),
             Err(ReadlineError::Interrupted) => {
-                println!("CTRL-C");
+                warn!("CTRL-C");
                 readline
             }
             Err(ReadlineError::Eof) => {
-                println!("CTRL-D");
+                warn!("CTRL-D");
                 readline
             }
             Err(err) => {
-                println!("Error: {:?}", err);
+                warn!("Error: {:?}", err);
                 Err(err)
             }
         }
@@ -84,15 +85,15 @@ impl MyReadline for MyEditor {
                     lines.push(line_value.trim().to_string());
                 }
                 Err(ReadlineError::Interrupted) => {
-                    println!("CTRL-C");
+                    warn!("CTRL-C");
                     break;
                 }
                 Err(ReadlineError::Eof) => {
-                    println!("CTRL-D");
+                    warn!("CTRL-D");
                     break;
                 }
                 Err(err) => {
-                    println!("Error: {:?}", err);
+                    warn!("Error: {:?}", err);
                 }
             }
         }
@@ -121,7 +122,7 @@ impl MyReadline for MyEditor {
 
 impl MyEditor {
     fn print_prompt(&self, prompt: &str) {
-        println!("{}", prompt);
+        info!("{}", prompt);
     }
 
     fn read_line_raw(&mut self, prompt: &str) -> Result<String, ReadlineError> {

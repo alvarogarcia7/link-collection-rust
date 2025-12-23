@@ -6,6 +6,7 @@ use std::process::exit;
 
 // use clap::{Args, Parser, Subcommand, ValueEnum};
 use clap::{arg, Args, Parser, Subcommand};
+use log::{info, warn};
 
 use data_access::recutils_database::RecutilsDatabaseWriter;
 use domain::interfaces::record::RecordProvider;
@@ -61,7 +62,7 @@ impl<'a> App<'a> {
                     destination_path,
                 )
                 .unwrap();
-                println!("Formatted file written to: {:?}", destination_path);
+                info!("Formatted file written to: {:?}", destination_path);
                 Ok(())
             }
             Commands::NewRecord { from } => {
@@ -95,12 +96,12 @@ impl<'a> App<'a> {
                 maybe_id[1].to_string()
             };
             if !id_string.chars().all(char::is_numeric) {
-                println!("[ImportNotNumeric] The import command should have the format: import:1234: {id_string}");
+                warn!("[ImportNotNumeric] The import command should have the format: import:1234: {id_string}");
                 return None;
             }
             let id_x = id_string.parse::<u64>();
             if id_x.is_err() {
-                print!(
+                warn!(
                     "Couldn't parse the number {:?}. Full string: {:?}",
                     id_string, provider_name
                 );
@@ -120,7 +121,7 @@ impl<'a> App<'a> {
                 Some(Box::new(FileReaderRecordProvider::new(record_file?))
                     as Box<dyn RecordProvider>)
             } else {
-                println!("File not found at: {:?}. Aborting.", provider_name);
+                warn!("File not found at: {:?}. Aborting.", provider_name);
                 None
             }
         }
@@ -265,6 +266,9 @@ impl<'a> App<'a> {
 }
 
 fn main() {
+    env_logger::Builder::from_default_env()
+        .filter_level(log::LevelFilter::Info)
+        .init();
     let args = Cli::parse();
 
     let (download_path, database_path) = if args.environment == "pro" {

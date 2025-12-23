@@ -5,6 +5,7 @@ use std::path::Path;
 use std::process::Command;
 
 use rrecutils::Recfile;
+use log::{debug, info};
 
 use crate::dto::to_dto;
 use domain::interfaces::database::{DatabaseReadAccess, DatabaseWriteAccess};
@@ -62,7 +63,7 @@ impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
                 }
             })
             .collect::<Vec<Record>>();
-        println!("Mapped records: {:?}", mapped_records.len());
+        debug!("Mapped records: {:?}", mapped_records.len());
         mapped_records
     }
 }
@@ -123,7 +124,7 @@ impl<'a> RecutilsDatabaseWriter<'a> {
             .arg(self.path.file_name().unwrap())
             .output()
             .expect("Git add went wrong");
-        println!("{:?}", String::from_utf8(command.stdout));
+        debug!("{:?}", String::from_utf8(command.stdout));
 
         let command2 = Command::new("git")
             .arg("commit")
@@ -134,7 +135,7 @@ impl<'a> RecutilsDatabaseWriter<'a> {
             .current_dir(self.path.parent().unwrap())
             .output()
             .expect("failed to execute process");
-        println!("{:?}", String::from_utf8(command2.stdout));
+        debug!("{:?}", String::from_utf8(command2.stdout));
     }
 }
 
@@ -150,6 +151,6 @@ impl<'a> DatabaseWriteAccess for RecutilsDatabaseWriter<'a> {
         let mut writer = BufWriter::new(file);
         recfile.write(&mut writer).unwrap();
         writer.flush().unwrap();
-        println!("Wrote record to database file: {:?}", self.path);
+        info!("Wrote record to database file: {:?}", self.path);
     }
 }

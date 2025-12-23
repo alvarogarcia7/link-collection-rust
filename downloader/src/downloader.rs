@@ -1,5 +1,6 @@
 use chrono::{DateTime, FixedOffset};
 use serde::Deserialize;
+use log::{warn, info};
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct NodeView {
@@ -43,14 +44,14 @@ impl FirebaseHackerNewsDownloader {
         let response = response?;
         if response.status() != 200 {
             let error = response.error_for_status().unwrap_err();
-            println!(
+            warn!(
                 "Download status is not OK. Status = {:?} at url = {:?}",
                 error.status(),
                 error.url().unwrap().as_str()
             );
             return Err(error);
         } else {
-            println!("Downloaded OK from url = {:?}", response.url().to_string());
+            info!("Downloaded OK from url = {:?}", response.url().to_string());
         }
         response.json::<NodeView>().map(|node_view| ResponseView {
             node_view,

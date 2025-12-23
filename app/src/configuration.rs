@@ -1,6 +1,7 @@
 use core::str;
 use std::env;
 use std::path::Path;
+use log::error;
 
 #[derive(Debug)]
 pub struct GlobalConfiguration<'a> {
@@ -24,8 +25,8 @@ impl<'a> GlobalConfiguration<'a> {
     pub fn verify_path(raw_value: &str) -> Option<&Path> {
         let path = Path::new(raw_value);
         if !path.exists() {
-            eprintln!("PWD: {:?}", env::current_dir());
-            eprintln!("This path does not exist: {:?}", path);
+            error!("PWD: {:?}", env::current_dir());
+            error!("This path does not exist: {:?}", path);
             return None;
         }
         Some(path)

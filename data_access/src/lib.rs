@@ -12,11 +12,12 @@ pub mod tests {
     use rrecutils::{Recfile, Record};
 
     use domain::RecordGrain;
+    use log::info;
 
     #[test]
     #[ignore]
     pub fn read_file() {
-        println!("{:?}", env::current_dir());
+        info!("{:?}", env::current_dir());
         let file = File::open("./tests/data/links.rec").unwrap();
         let reader = BufReader::new(file);
 
@@ -107,7 +108,7 @@ Tags: tag1, tag_2, name-surname
     #[ignore]
     pub fn write_file() {
         {
-            println!("{:?}", env::current_dir());
+            info!("{:?}", env::current_dir());
             let file = File::create("./data/links_mod.rec").unwrap();
             let writer = &mut BufWriter::new(file);
 
