@@ -137,6 +137,10 @@ impl<'a> App<'a> {
                 DateProvider::default(),
                 FirebaseHackerNewsDownloader::new(hacker_news_path),
                 // FirebaseHackerNewsDownloader::new("https://hacker-news.firebaseio.com".to_string()),
+                Box::new(RecutilsDatabaseAccess::new(
+                    &*Box::leak(path.clone().into_boxed_str()),
+                    "Link".to_string(),
+                )),
                 id,
             )) as Box<dyn RecordProvider>)
         } else {
