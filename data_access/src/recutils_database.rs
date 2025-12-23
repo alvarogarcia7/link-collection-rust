@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Write};
 use std::path::Path;
@@ -24,7 +24,7 @@ impl<'a> RecutilsDatabaseAccess<'a> {
 }
 
 impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
-    fn read_all(self) -> Vec<Record> {
+    fn read_all(&self) -> Vec<Record> {
         let reader = Recfile::parse(BufReader::new(File::open(self.path).unwrap())).unwrap();
 
         let mapped_records = reader
@@ -65,6 +65,32 @@ impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
             .collect::<Vec<Record>>();
         debug!("Mapped records: {:?}", mapped_records.len());
         mapped_records
+    }
+    fn read_all_tags(&self) -> HashSet<String> {
+        let reader = Recfile::parse(BufReader::new(File::open(self.path).unwrap())).unwrap();
+
+        let mapped_tags = dbg!(reader
+            .iter_by_type(&self.record_type)
+            .flat_map(|foreign| {
+                let vec = foreign
+                    .fields
+                    .iter()
+                    .find(|(k, _)| k == "Tags")
+                    .map(|(_, v)| v.clone())
+                    .map(|tags| {
+                        tags.split(',')
+                            .map(|s| s.trim().to_string())
+                            .collect::<Vec<String>>()
+                    })
+                    .iter()
+                    .flatten()
+                    .cloned()
+                    .collect::<Vec<String>>();
+                vec
+            })
+            .collect::<HashSet<String>>());
+        println!("Mapped tags: {:?}", mapped_tags.len());
+        mapped_tags
     }
 }
 

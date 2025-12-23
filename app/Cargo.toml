@@ -10,7 +10,8 @@ domain = { path = "../domain" }
 data_access = { path = "../data_access" }
 rustache = "0.1.0"
 infra = { path = "../infra" }
-downloader = { path = "../downloader" }
+downloader = { path = "../downloader"}
+fzf-wrapped = "0.1.4"
 log = { workspace = true }
 env_logger = { workspace = true }
 toml = "0.8"

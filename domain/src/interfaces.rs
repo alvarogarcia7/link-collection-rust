@@ -1,8 +1,10 @@
 pub mod database {
     use crate::Record;
+    use std::collections::HashSet;
 
     pub trait DatabaseReadAccess {
-        fn read_all(self) -> Vec<Record>;
+        fn read_all(&self) -> Vec<Record>;
+        fn read_all_tags(&self) -> HashSet<String>;
     }
 
     pub trait DatabaseWriteAccess {

@@ -9,6 +9,7 @@ domain = { path = "../domain" }
 mockall = "0.12.1"
 rustyline = "14.0.0"
 downloader = { path = "../downloader" }
+fzf-wrapped = "0.1.4"
 log = { workspace = true }
 
 [dependencies.uuid]

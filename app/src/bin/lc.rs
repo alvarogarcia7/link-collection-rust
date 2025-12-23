@@ -8,7 +8,8 @@ use std::process::exit;
 use clap::{Args, Parser, Subcommand};
 use log::{info, warn};
 
-use data_access::recutils_database::RecutilsDatabaseWriter;
+use data_access::recutils_database::{RecutilsDatabaseAccess, RecutilsDatabaseWriter};
+use domain::interfaces::database::DatabaseReadAccess;
 use domain::interfaces::record::RecordProvider;
 use downloader::downloader::FirebaseHackerNewsDownloader;
 use infra::cli_line_reader::{CliReaderRecordProvider, MyEditor};
@@ -81,11 +82,15 @@ impl<'a> App<'a> {
                 Ok(())
             }
             Commands::NewRecord { from } => {
-                let record_provider =
-                    Self::decide_which_provider(self.app_options.hackernews_api_path, &from);
+                let path = self.app_options.database_path;
+                let record_provider = Self::decide_which_provider(
+                    self.app_options.hackernews_api_path,
+                    &from,
+                    path.to_str().unwrap().to_string(),
+                );
                 // AGB: alternative: ok_or_else
                 let mut record_provider = record_provider.ok_or(())?;
-                NewRecordUseCase::new(RecutilsDatabaseWriter::new(self.app_options.database_path))
+                NewRecordUseCase::new(RecutilsDatabaseWriter::new(path))
                     .run(&mut *record_provider)
                     .map_err(|_| ())
             }
@@ -95,6 +100,7 @@ impl<'a> App<'a> {
     fn decide_which_provider(
         hacker_news_path: String,
         provider_name: &String,
+        path: String,
     ) -> Option<Box<dyn RecordProvider + 'static>> {
         if "hardcoded" == provider_name {
             Some(Box::<HardcodedRecordProvider>::default() as Box<dyn RecordProvider>)
@@ -102,6 +108,10 @@ impl<'a> App<'a> {
             Some(Box::new(CliReaderRecordProvider::new(
                 MyEditor::default(),
                 DateProvider::default(),
+                Box::new(RecutilsDatabaseAccess::new(
+                    &*Box::leak(path.into_boxed_str()),
+                    "Link".to_string(),
+                )),
             )) as Box<dyn RecordProvider>)
         } else if provider_name.starts_with("import") {
             let id_string = if provider_name.contains('=') {
