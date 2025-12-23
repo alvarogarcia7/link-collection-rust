@@ -1,4 +1,5 @@
 use uuid::Uuid;
+use log::{debug, info};
 
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
@@ -50,8 +51,8 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
 
         let date = DateFormatter::default().format(&time_);
 
-        println!("Title: {:?}", title);
-        println!("time: {:?}", time_);
+        info!("Title: {:?}", title);
+        info!("time: {:?}", time_);
 
         const FAKE: bool = false;
 
@@ -90,7 +91,7 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
             fields.push(RecordGrain::new(key.clone(), value.clone()));
         }
 
-        println!("{:?}", fields);
+        debug!("{:?}", fields);
 
         Ok((
             Record {

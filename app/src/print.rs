@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::{BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::{env, fs, io};
+use log::info;
 
 struct R {
     rec: rrecutils::Record,
@@ -63,7 +64,7 @@ pub fn run(
     template_name: String,
     destination: &Path,
 ) -> Result<(), String> {
-    println!("PWD: {:?}", env::current_dir());
+    info!("PWD: {:?}", env::current_dir());
 
     let file = File::open(database_path).unwrap();
 

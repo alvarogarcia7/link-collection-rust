@@ -9,3 +9,4 @@ serde_json = "1.0.117"
 serde = { version = "1.0.203", features = ["derive"] }
 domain = { path = "../domain" }
 chrono = "0.4.38"
+log = { workspace = true }
