@@ -193,11 +193,18 @@ impl RecordProvider for CliReaderRecordProvider {
                     .read_until_ctrl_d("Body".to_string())
                     .join("\n"),
             ),
-            (
-                "Category".to_string(),
-                self.line_reader
-                    .read_line("Category (mandatory)".to_string()),
-            ),
+            ("Category".to_string(), {
+                let vec2 = FzfSelector::select_single_from(
+                    "Pick category",
+                    self.database
+                        .read_all_category()
+                        .into_iter()
+                        .collect::<Vec<String>>()
+                        .clone(),
+                );
+                println!("Selected category from FZF: {:?}", vec2);
+                vec2[0].clone()
+            }),
             ("Tags".to_string(), {
                 let mut vec1: Vec<String> = vec![];
                 loop {

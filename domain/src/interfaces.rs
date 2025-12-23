@@ -5,6 +5,7 @@ pub mod database {
     pub trait DatabaseReadAccess {
         fn read_all(&self) -> Vec<Record>;
         fn read_all_tags(&self) -> HashSet<String>;
+        fn read_all_category(&self) -> HashSet<String>;
     }
 
     pub trait DatabaseWriteAccess {

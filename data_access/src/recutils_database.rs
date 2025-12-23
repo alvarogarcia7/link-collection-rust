@@ -69,7 +69,7 @@ impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
     fn read_all_tags(&self) -> HashSet<String> {
         let reader = Recfile::parse(BufReader::new(File::open(self.path).unwrap())).unwrap();
 
-        let mapped_tags = dbg!(reader
+        let mapped_tags = reader
             .iter_by_type(&self.record_type)
             .flat_map(|foreign| {
                 let vec = foreign
@@ -88,9 +88,29 @@ impl<'a> DatabaseReadAccess for RecutilsDatabaseAccess<'a> {
                     .collect::<Vec<String>>();
                 vec
             })
-            .collect::<HashSet<String>>());
+            .collect::<HashSet<String>>();
+        // TODO AGB: How to use dbg! macro here?
         println!("Mapped tags: {:?}", mapped_tags.len());
         mapped_tags
+    }
+
+    fn read_all_category(&self) -> HashSet<String> {
+        let reader = Recfile::parse(BufReader::new(File::open(self.path).unwrap())).unwrap();
+
+        let mapped_all_category = reader
+            .iter_by_type(&self.record_type)
+            .map(|foreign| {
+                foreign
+                    .fields
+                    .iter()
+                    .find(|(k, _)| k == "Category")
+                    .map(|(_, v)| v.clone())
+            })
+            .filter(|p| !p.is_none())
+            .map(|p| p.unwrap())
+            .collect::<HashSet<String>>();
+        println!("Mapped (all) category: {:?}", mapped_all_category.len());
+        mapped_all_category
     }
 }
 

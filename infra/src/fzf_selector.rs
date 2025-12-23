@@ -51,5 +51,31 @@ pub mod fzf_selector_mod {
                 None => vec![],
             }
         }
+
+        pub fn select_single_from(
+            prompt: &str,
+            items: impl IntoIterator<Item = impl Into<String>>,
+        ) -> Vec<String> {
+            let mut fzf = Fzf::builder().prompt(prompt).build().unwrap();
+
+            fzf.run()
+                .expect("Failed to start fzf: is it present in the $PATH?");
+
+            let mut sorted_items: Vec<String> = items.into_iter().map(|item| item.into()).collect();
+            sorted_items.sort();
+
+            fzf.add_items(sorted_items.iter().rev()).unwrap();
+
+            let output = fzf.output();
+
+            match output {
+                Some(selected) => selected
+                    .lines()
+                    .map(|line| line.trim().to_string())
+                    .filter(|line| !line.is_empty())
+                    .collect(),
+                None => vec![],
+            }
+        }
     }
 }
