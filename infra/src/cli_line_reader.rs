@@ -102,7 +102,6 @@ impl MyReadline for MyEditor {
                 }
                 Err(err) => {
                     println!("Error: {:?}", err);
-                    ret = 3;
                 }
             }
         }
