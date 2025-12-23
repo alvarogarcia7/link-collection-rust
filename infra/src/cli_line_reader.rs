@@ -6,7 +6,7 @@ use rustyline::{DefaultEditor, EditMode, Editor};
 use uuid::Uuid;
 
 use crate::date::{DateFormattable, DateFormatter, DateProvidable, DateProvider};
-use crate::fzf_selector::fzf_selector::FzfSelector;
+use crate::fzf_selector::fzf_selector_mod::FzfSelector;
 use domain::interfaces::database::DatabaseReadAccess;
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
@@ -82,7 +82,7 @@ impl MyReadline for MyEditor {
     fn read_until_ctrl_d_with_ret_code(&mut self, query: String) -> (Vec<String>, i32) {
         let mut lines = vec![];
         self.print_prompt(&format!("Type '{}' (CTRL-D to finish)", query));
-        let mut ret: i32 = 0;
+        let ret: i32;
         loop {
             let readline = self.read_line_raw(">> ");
             match readline {

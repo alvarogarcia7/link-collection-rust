@@ -9,7 +9,6 @@ use clap::{Args, Parser, Subcommand};
 use log::{info, warn};
 
 use data_access::recutils_database::{RecutilsDatabaseAccess, RecutilsDatabaseWriter};
-use domain::interfaces::database::DatabaseReadAccess;
 use domain::interfaces::record::RecordProvider;
 use downloader::downloader::FirebaseHackerNewsDownloader;
 use infra::cli_line_reader::{CliReaderRecordProvider, MyEditor};

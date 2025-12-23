@@ -1,4 +1,4 @@
-pub mod fzf_selector {
+pub mod fzf_selector_mod {
     //     fn select_multiple_from(colours: Vec<&str>) -> _ {
     //         let mut fzf = Fzf::builder()
     //             .custom_args(vec!["--multi".to_string()])
