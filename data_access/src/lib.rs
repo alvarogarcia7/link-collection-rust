@@ -51,8 +51,7 @@ pub mod tests {
                 "Body".to_string(),
                 ["Body Line1", "Body line 2", "LONG LONG LONG"].join("\n+ "),
             ),
-            ("Tags".to_string(), "tag1, tag_2, name-surname".to_string()),
-        ];
+            ("Tags".to_string(), "tag1, tag_2, name-surname".to_string())];
         let mut fields: Vec<RecordGrain> = vec![];
 
         for (key, value) in field_values.iter() {
