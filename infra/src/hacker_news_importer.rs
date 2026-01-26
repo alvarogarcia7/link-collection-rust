@@ -89,7 +89,10 @@ impl RecordProvider for FirebaseHackerNewsImporterProvider {
                 .read_all_tags()
                 .into_iter()
                 .collect::<Vec<String>>();
-            let mut vec2 = FzfSelector::select_multiple_from("Pick tags (use TAB to select multiple)", set.clone());
+            let mut vec2 = FzfSelector::select_multiple_from(
+                "Pick tags (use TAB to select multiple)",
+                set.clone(),
+            );
             println!("Selected tags from FZF: {:?}", vec2);
             selected_tags.append(&mut vec2);
             tags.append(&mut selected_tags);
@@ -227,7 +230,7 @@ mod tests {
     #[test]
     fn test_category_selection_when_available() {
         // Verify that category is correctly selected
-        let vec2 = vec!["craftsmanship".to_string()];
+        let vec2 = ["craftsmanship".to_string()];
         let category = if vec2.is_empty() {
             "uncategorized".to_string()
         } else {
