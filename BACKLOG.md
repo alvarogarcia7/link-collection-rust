@@ -37,7 +37,7 @@ fn main() {
     }
 }
 ```
-### STORY - ID:6.2 - Add a logger
+### ✅STORY - ID:6.2 - Add a logger
 ### ✅STORY - ID:6.3 - Add a configuration so the values are not repeated
 ### ✅STORY - ID:6.4 - Read the configuration from a file
 #### Acceptance Criteria:
