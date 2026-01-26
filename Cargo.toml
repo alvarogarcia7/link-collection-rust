@@ -5,7 +5,7 @@ members = [
     , "domain"
     , "infra"
     , "app"
-    , "downloader"]
+    , "downloader", "stubs"]
 
 [workspace.dependencies]
 log = "0.4.21"
