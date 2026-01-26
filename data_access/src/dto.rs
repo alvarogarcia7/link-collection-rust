@@ -17,7 +17,6 @@ pub fn to_dto(records: Vec<domain::Record>) -> Vec<Record> {
 }
 
 #[cfg(test)]
-
 pub mod tests {
     use crate::dto::to_dto;
     use domain::{Record, RecordGrain};

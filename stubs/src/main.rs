@@ -3,7 +3,7 @@ use hyper::{Body, Request, Response, Server, StatusCode};
 use log::{error, info, warn};
 use serde_json::json;
 use std::convert::Infallible;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
 
 #[tokio::main]
@@ -69,11 +69,7 @@ async fn handle_request(
     info!("Received {} request: {}", method, path);
 
     // Construct the directory path by removing leading slash
-    let path_without_leading_slash = if path.starts_with('/') {
-        &path[1..]
-    } else {
-        path
-    };
+    let path_without_leading_slash = path.strip_prefix('/').unwrap_or(path);
 
     let endpoint_dir = root_dir.join(path_without_leading_slash);
 
@@ -151,7 +147,7 @@ async fn handle_request(
                 }
             }
         }
-        Err(e) => {
+        Err(_) => {
             warn!("Configuration file not found: {:?}", config_path);
             error_response(
                 StatusCode::NOT_FOUND,

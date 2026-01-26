@@ -39,7 +39,7 @@ fn render_to_single_file(
             first = false;
         } else if let Some(j) = joiner {
             output.write_all(j.as_bytes()).unwrap();
-            output.write_all(&[b'\n']).unwrap();
+            output.write_all(b"\n").unwrap();
         }
         R { rec: r }
             .render(&template, &mut output.as_mut())

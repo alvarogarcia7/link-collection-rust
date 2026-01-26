@@ -143,7 +143,7 @@ impl RecordProvider for CliReaderRecordProvider {
         let id = Uuid::new_v4().to_string();
         let formatted_date = DateFormatter::default().format(&self.date_provider.now());
 
-        let field_values = vec![
+        let field_values = [
             ("Id".to_string(), id),
             ("Date".to_string(), formatted_date),
             (
