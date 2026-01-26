@@ -1,13 +1,14 @@
 version: '3.9'
 services:
   httpstub:
-    build:
-        context: .
-        dockerfile: ./stubs/Dockerfile
-    working_dir: "/stubs"
+    image: rust:1.75
+    working_dir: "/app"
     command:
-      - stubs -p 8181 .
+      - sh
+      - -c
+      - "cargo build --release --package stubs && /app/target/release/stubs -p 8181 /stubs"
     volumes:
+      - ".:/app"
       - "./downloader/tests/http-stubs:/stubs"
     ports:
       - "8181:8181"
