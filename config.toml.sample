@@ -1,0 +1,16 @@
+# Link Collection Configuration File
+# Copy this file to ~/.config/lc/config.toml and modify as needed
+
+# Path to the database file (rec format)
+database_file = "./data/database/links.rec"
+
+# Log level: trace, debug, info, warn, error, off
+log_level = "info"
+
+# Path to template files directory
+template_file = "./data/template/"
+
+# URL to download HackerNews items from
+# Development: "http://0.0.0.0:8181"
+# Production: "https://hacker-news.firebaseio.com"
+hacker_news_url = "https://hacker-news.firebaseio.com"
