@@ -111,32 +111,74 @@ mod tests {
 
     #[test]
     fn test_parse_log_level() {
-        let mut config = ConfigFile::default();
+        assert_eq!(
+            ConfigFile {
+                log_level: "trace".to_string(),
+                ..Default::default()
+            }
+            .parse_log_level()
+            .unwrap(),
+            log::LevelFilter::Trace
+        );
 
-        config.log_level = "trace".to_string();
-        assert_eq!(config.parse_log_level().unwrap(), log::LevelFilter::Trace);
+        assert_eq!(
+            ConfigFile {
+                log_level: "debug".to_string(),
+                ..Default::default()
+            }
+            .parse_log_level()
+            .unwrap(),
+            log::LevelFilter::Debug
+        );
 
-        config.log_level = "debug".to_string();
-        assert_eq!(config.parse_log_level().unwrap(), log::LevelFilter::Debug);
+        assert_eq!(
+            ConfigFile {
+                log_level: "info".to_string(),
+                ..Default::default()
+            }
+            .parse_log_level()
+            .unwrap(),
+            log::LevelFilter::Info
+        );
 
-        config.log_level = "info".to_string();
-        assert_eq!(config.parse_log_level().unwrap(), log::LevelFilter::Info);
+        assert_eq!(
+            ConfigFile {
+                log_level: "warn".to_string(),
+                ..Default::default()
+            }
+            .parse_log_level()
+            .unwrap(),
+            log::LevelFilter::Warn
+        );
 
-        config.log_level = "warn".to_string();
-        assert_eq!(config.parse_log_level().unwrap(), log::LevelFilter::Warn);
+        assert_eq!(
+            ConfigFile {
+                log_level: "error".to_string(),
+                ..Default::default()
+            }
+            .parse_log_level()
+            .unwrap(),
+            log::LevelFilter::Error
+        );
 
-        config.log_level = "error".to_string();
-        assert_eq!(config.parse_log_level().unwrap(), log::LevelFilter::Error);
-
-        config.log_level = "off".to_string();
-        assert_eq!(config.parse_log_level().unwrap(), log::LevelFilter::Off);
+        assert_eq!(
+            ConfigFile {
+                log_level: "off".to_string(),
+                ..Default::default()
+            }
+            .parse_log_level()
+            .unwrap(),
+            log::LevelFilter::Off
+        );
     }
 
     #[test]
     fn test_parse_log_level_case_insensitive() {
-        let mut config = ConfigFile::default();
+        let mut config = ConfigFile {
+            log_level: "DEBUG".to_string(),
+            ..Default::default()
+        };
 
-        config.log_level = "DEBUG".to_string();
         assert_eq!(config.parse_log_level().unwrap(), log::LevelFilter::Debug);
 
         config.log_level = "Info".to_string();
@@ -145,8 +187,11 @@ mod tests {
 
     #[test]
     fn test_parse_log_level_invalid() {
-        let mut config = ConfigFile::default();
-        config.log_level = "invalid".to_string();
+        let config = ConfigFile {
+            log_level: "invalid".to_string(),
+            ..Default::default()
+        };
+
         assert!(config.parse_log_level().is_err());
     }
 
