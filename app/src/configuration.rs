@@ -1,7 +1,7 @@
 use core::str;
+use log::error;
 use std::env;
 use std::path::Path;
-use log::error;
 
 #[derive(Debug)]
 pub struct GlobalConfiguration<'a> {

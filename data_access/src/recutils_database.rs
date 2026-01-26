@@ -4,8 +4,8 @@ use std::io::{BufReader, BufWriter, Write};
 use std::path::Path;
 use std::process::Command;
 
-use rrecutils::Recfile;
 use log::{debug, info};
+use rrecutils::Recfile;
 
 use crate::dto::to_dto;
 use domain::interfaces::database::{DatabaseReadAccess, DatabaseWriteAccess};

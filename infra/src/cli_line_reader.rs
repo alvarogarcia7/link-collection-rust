@@ -1,9 +1,9 @@
+use log::{info, warn};
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::FileHistory;
 use rustyline::{DefaultEditor, EditMode, Editor};
 use uuid::Uuid;
-use log::{info, warn};
 
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;

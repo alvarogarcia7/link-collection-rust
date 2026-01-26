@@ -1,9 +1,9 @@
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
 use domain::{Record, RecordGrain};
+use log::info;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use log::info;
 
 pub struct FileReaderRecordProvider {
     path: PathBuf,

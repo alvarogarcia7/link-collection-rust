@@ -1,10 +1,10 @@
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Request, Response, Server, StatusCode};
+use log::{error, info, warn};
 use serde_json::json;
 use std::convert::Infallible;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use log::{info, warn, error};
 
 #[tokio::main]
 async fn main() {
@@ -37,7 +37,10 @@ async fn main() {
     let root_dir = Arc::new(root_dir);
     let addr = ([0, 0, 0, 0], port).into();
 
-    info!("Starting HTTP stub server on {} with root directory: {:?}", addr, root_dir);
+    info!(
+        "Starting HTTP stub server on {} with root directory: {:?}",
+        addr, root_dir
+    );
 
     let make_service = make_service_fn(move |_conn| {
         let root_dir = Arc::clone(&root_dir);
@@ -86,11 +89,14 @@ async fn handle_request(
                 Ok(config) => {
                     // Try to get the "default" response configuration
                     if let Some(default_response) = config.get("default") {
-                        if let Some(body_file) = default_response.get("body").and_then(|v| v.as_str()) {
+                        if let Some(body_file) =
+                            default_response.get("body").and_then(|v| v.as_str())
+                        {
                             let status_code = default_response
                                 .get("status")
                                 .and_then(|v| v.as_u64())
-                                .unwrap_or(200) as u16;
+                                .unwrap_or(200)
+                                as u16;
 
                             let response_file = endpoint_dir.join(body_file);
                             info!("Loading response from: {:?}", response_file);
@@ -100,7 +106,10 @@ async fn handle_request(
                                     let status = StatusCode::from_u16(status_code)
                                         .unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
 
-                                    info!("Returning status {} with body from {}", status_code, body_file);
+                                    info!(
+                                        "Returning status {} with body from {}",
+                                        status_code, body_file
+                                    );
                                     Ok(Response::builder()
                                         .status(status)
                                         .header("Content-Type", "application/json")
@@ -108,7 +117,10 @@ async fn handle_request(
                                         .unwrap())
                                 }
                                 Err(e) => {
-                                    warn!("Failed to read response file {:?}: {}", response_file, e);
+                                    warn!(
+                                        "Failed to read response file {:?}: {}",
+                                        response_file, e
+                                    );
                                     error_response(
                                         StatusCode::INTERNAL_SERVER_ERROR,
                                         &format!("Failed to read response file: {}", e),
@@ -149,13 +161,11 @@ async fn handle_request(
     }
 }
 
-fn error_response(
-    status: StatusCode,
-    message: &str,
-) -> Result<Response<Body>, Infallible> {
+fn error_response(status: StatusCode, message: &str) -> Result<Response<Body>, Infallible> {
     let body = json!({
         "error": message
-    }).to_string();
+    })
+    .to_string();
 
     Ok(Response::builder()
         .status(status)

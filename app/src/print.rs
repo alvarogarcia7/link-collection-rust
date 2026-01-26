@@ -1,9 +1,9 @@
+use log::info;
 use rustache::Render;
 use std::fs::File;
 use std::io::{BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::{env, fs, io};
-use log::info;
 
 struct R {
     rec: rrecutils::Record,

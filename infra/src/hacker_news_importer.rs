@@ -1,5 +1,5 @@
-use uuid::Uuid;
 use log::{debug, info};
+use uuid::Uuid;
 
 use domain::interfaces::record::RecordProvider;
 use domain::interfaces::RecordProviderError;
