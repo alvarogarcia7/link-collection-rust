@@ -32,7 +32,7 @@ pub mod tests {
 
     #[test]
     pub fn keep_the_order_of_the_fields() {
-        let field_values = vec![
+        let field_values = [
             (
                 "Id".to_string(),
                 "a1a6925a-7958-11e8-a87f-0242ac110002".to_string(),

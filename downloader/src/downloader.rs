@@ -1,6 +1,6 @@
 use chrono::{DateTime, FixedOffset};
+use log::{info, warn};
 use serde::Deserialize;
-use log::{warn, info};
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct NodeView {

@@ -6,8 +6,9 @@ format-check:
 	cargo fmt --all -- --check
 .PHONY: format-check
 
-test: up
+test: start-stubs
 	cargo test --all --all-features --tests
+	make stop-stubs
 .PHONY: test
 
 test-expensive:
@@ -33,11 +34,12 @@ doc:
 
 all: format clippy test doc
 
-up:
-	docker compose up -d
+start-stubs:
+	cargo build --release --package stubs
+	./target/release/stubs -p 8181 ./downloader/tests/http-stubs &
 
-down:
-	docker compose down
+stop-stubs:
+	pkill -f "stubs -p 8181" || true
 
 build:
 	cargo build

@@ -9,7 +9,7 @@ impl HardcodedRecordProvider {}
 
 impl RecordProvider for HardcodedRecordProvider {
     fn fetch(&mut self) -> Result<(Record, Vec<String>), RecordProviderError> {
-        let field_values = vec![
+        let field_values = [
             (
                 "Id".to_string(),
                 "a1a6925a-7958-11e8-a87f-0242ac110002".to_string(),

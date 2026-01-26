@@ -5,7 +5,7 @@ use std::path::Path;
 use std::process::exit;
 
 // use clap::{Args, Parser, Subcommand, ValueEnum};
-use clap::{arg, Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use log::{info, warn};
 
 use data_access::recutils_database::RecutilsDatabaseWriter;
@@ -90,7 +90,7 @@ impl<'a> App<'a> {
             )) as Box<dyn RecordProvider>)
         } else if provider_name.starts_with("import") {
             let id_string = if provider_name.contains('=') {
-                provider_name.split('=').last().unwrap().to_string()
+                provider_name.split('=').next_back().unwrap().to_string()
             } else {
                 let maybe_id: Vec<&str> = provider_name.split(':').collect();
                 maybe_id[1].to_string()
