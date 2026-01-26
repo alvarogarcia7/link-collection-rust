@@ -39,7 +39,7 @@ fn main() {
 ```
 ### STORY - ID:6.2 - Add a logger
 ### ✅STORY - ID:6.3 - Add a configuration so the values are not repeated
-### STORY - ID:6.4 - Read the configuration from a file
+### ✅STORY - ID:6.4 - Read the configuration from a file
 #### Acceptance Criteria:
 * The configuration file is in TOML format
 * The configuration file is read from the user's home directory: ~/.config/lc/config.toml
@@ -53,28 +53,28 @@ fn main() {
   * hacker_news_url: URL to download the hackernews items from
 
 For this item to be complete, the following tasks need to be done:
-* [ ] Create a struct to hold the configuration values
-* [ ] Implement the logic to read the configuration file from the user's home directory
-* [ ] Implement the logic to read the configuration file from the .env.local file
-* [ ] Implement the logic to read the configuration file from the environment variable
-* [ ] Implement the logic to read the configuration file from the command line argument
-* [ ] Implement the logic to merge the configuration values from the different sources
-* [ ] Write tests to verify the configuration reading logic
-* [ ] Update the documentation to explain how to use the configuration file
-* [ ] Update the README file to include information about the configuration file
-* [ ] Create example configuration files for users to reference (.env.sample and config.toml.sample)
-* [ ] Remove the logic to read from --env-file as it is no longer needed
-* [ ] Update existing code to use the configuration values from the struct instead of hardcoded values
-* [ ] Ensure proper error handling and logging for configuration reading issues
-* [ ] Perform integration testing to ensure the application works correctly with the configuration file
-* [ ] Update the build scripts to include the new configuration file if necessary
-* [ ] Update the CI/CD pipeline to include tests for the configuration reading logic[ ] 
-* [ ] Update the deployment scripts to ensure the configuration file is included
-* [ ] Update the logging setup to use the log_level from the configuration file
-* [ ] Update the database connection logic to use the database_file from the configuration file
-* [ ] Update the template rendering logic to use the template_file from the configuration file
-* [ ] Update the hackernews download logic to use the hacker_news_url from the configuration file
-* [ ] Perform a code review to ensure the configuration reading logic is implemented correctly
+* [x] Create a struct to hold the configuration values
+* [x] Implement the logic to read the configuration file from the user's home directory
+* [x] Implement the logic to read the configuration file from the .env.local file
+* [x] Implement the logic to read the configuration file from the environment variable
+* [x] Implement the logic to read the configuration file from the command line argument
+* [x] Implement the logic to merge the configuration values from the different sources
+* [x] Write tests to verify the configuration reading logic
+* [x] Update the documentation to explain how to use the configuration file
+* [x] Update the README file to include information about the configuration file
+* [x] Create example configuration files for users to reference (.env.sample and config.toml.sample)
+* [x] Remove the logic to read from --env-file as it is no longer needed
+* [x] Update existing code to use the configuration values from the struct instead of hardcoded values
+* [x] Ensure proper error handling and logging for configuration reading issues
+* [x] Perform integration testing to ensure the application works correctly with the configuration file
+* [x] Update the build scripts to include the new configuration file if necessary
+* [x] Update the CI/CD pipeline to include tests for the configuration reading logic
+* [x] Update the deployment scripts to ensure the configuration file is included
+* [x] Update the logging setup to use the log_level from the configuration file
+* [x] Update the database connection logic to use the database_file from the configuration file
+* [x] Update the template rendering logic to use the template_file from the configuration file
+* [x] Update the hackernews download logic to use the hacker_news_url from the configuration file
+* [x] Perform a code review to ensure the configuration reading logic is implemented correctly
 ### STORY - ID:6.5 - List the tags from the database
 ### EPIC - ID:2 - Add a new record to the database
 ### ✅STORY - ID:2.1 - From the CLI

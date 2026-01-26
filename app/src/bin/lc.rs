@@ -17,6 +17,7 @@ use infra::file_record_reader::FileReaderRecordProvider;
 use infra::hacker_news_importer::FirebaseHackerNewsImporterProvider;
 use infra::hardcoded::HardcodedRecordProvider;
 use select::commands::NewRecordUseCase;
+use select::config;
 use select::configuration::GlobalConfiguration;
 use select::print::run;
 
@@ -30,10 +31,24 @@ use select::print::run;
 struct Cli {
     #[arg(short, long)]
     file: Option<String>,
+
+    #[arg(long)]
+    config_file: Option<String>,
+
+    #[arg(long)]
+    database_file: Option<String>,
+
+    #[arg(long)]
+    log_level: Option<String>,
+
+    #[arg(long)]
+    template_file: Option<String>,
+
+    #[arg(long)]
+    hacker_news_url: Option<String>,
+
     #[command(subcommand)]
     command: Commands,
-    #[arg(short, long, default_value = "dev")]
-    environment: String,
 }
 
 #[derive(Debug)]
@@ -266,28 +281,41 @@ impl<'a> App<'a> {
 }
 
 fn main() {
-    env_logger::Builder::from_default_env()
-        .filter_level(log::LevelFilter::Info)
-        .init();
     let args = Cli::parse();
 
-    let (download_path, database_path) = if args.environment == "pro" {
-        (
-            "https://hacker-news.firebaseio.com".to_string(),
-            "../link-collection/data/links.rec".to_string(),
-        )
-    } else {
-        (
-            "http://0.0.0.0:8181".to_string(),
-            "./data/database/links.rec".to_string(),
-        )
-    };
+    // Load configuration with hierarchical override
+    let configuration = config::load_configuration(
+        args.config_file.as_deref(),
+        args.database_file.as_deref(),
+        args.log_level.as_deref(),
+        args.template_file.as_deref(),
+        args.hacker_news_url.as_deref(),
+    )
+    .unwrap_or_else(|e| {
+        eprintln!("Error loading configuration: {:?}", e);
+        exit(1);
+    });
+
+    // Setup logger with configured level
+    let log_level = configuration.parse_log_level().unwrap_or_else(|e| {
+        eprintln!(
+            "Invalid log level '{}': {}. Using Info.",
+            configuration.log_level, e
+        );
+        log::LevelFilter::Info
+    });
+
+    env_logger::Builder::from_default_env()
+        .filter_level(log_level)
+        .init();
+
+    info!("Configuration loaded successfully");
 
     let global_configuration = GlobalConfiguration::in_memory(
-        &database_path,
-        "./data/template/",
+        &configuration.database_file,
+        &configuration.template_file,
         "cli-short.mustache".to_string(),
-        download_path,
+        configuration.hacker_news_url,
     );
 
     let string = args.file.unwrap_or(
@@ -447,8 +475,12 @@ pub mod test_parsing_commands {
             assert_eq!(
                 actual,
                 Cli {
-                    environment: "dev".to_string(),
                     file: Some("$FILE".to_string()),
+                    config_file: None,
+                    database_file: None,
+                    log_level: None,
+                    template_file: None,
+                    hacker_news_url: None,
                     command: Commands::List(ListArgs {
                         target: Some("stdout".to_string())
                     })
@@ -466,8 +498,12 @@ pub mod test_parsing_commands {
         assert_eq!(
             actual,
             Cli {
-                environment: "dev".to_string(),
                 file: None,
+                config_file: None,
+                database_file: None,
+                log_level: None,
+                template_file: None,
+                hacker_news_url: None,
                 command: Commands::List(ListArgs {
                     target: Some("stdout".to_string())
                 })
@@ -540,8 +576,12 @@ pub mod test_parsing_commands {
             actual,
             Cli {
                 file: None,
-                command: Commands::List(ListArgs { target: None }),
-                environment: "dev".to_string()
+                config_file: None,
+                database_file: None,
+                log_level: None,
+                template_file: None,
+                hacker_news_url: None,
+                command: Commands::List(ListArgs { target: None })
             }
         );
     }
