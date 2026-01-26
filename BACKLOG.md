@@ -89,12 +89,10 @@ For this item to be complete, the following tasks need to be done:
 #### STORY - ID:5.1 - Create it
 #### STORY - ID:5.2 - Publish it to crates.io
 ### EPIC - ID:7 - Replace the Go Stubs with Rust Stubs
-#### STORY - ID:7.1 - Create Rust Stubs for existing Go Stubs
+#### ✅STORY - ID:7.1 - Create Rust Stubs for existing Go Stubs
 ##### Acceptance Criteria:
 * For each existing Go Stub (see docker-compose.yml), create a corresponding Rust Stub that replicates the functionality.
 * Remove the dependency to the Go Stubs from the project and to docker.
 * Ensure that the Rust Stubs can be easily started and stopped, similar to the Go Stubs.
 * In the Makefile, replace the commands that start and stop the Go Stubs with commands to start and stop the Rust Stubs.
-#### STORY - ID:7.2 - Replace Go Stubs with Rust Stubs in the project
-### EPIC - ID:8 - Migrate existing codebase from Go to Rust
 
