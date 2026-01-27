@@ -1,66 +1,12 @@
-format:
-	cargo fmt --all --
-.PHONY: format
+# Include modular makefiles organized by responsibility
+include makefiles/rust.mk
+include makefiles/clippy.mk
+include makefiles/test.mk
+include makefiles/app.mk
 
-format-check:
-	cargo fmt --all -- --check
-.PHONY: format-check
+all: format clippy test doc ## Run all quality checks (format, clippy, test, doc)
+.PHONY: all
 
-test: start-stubs
-	cargo test --all --all-features --tests
-	make stop-stubs
-.PHONY: test
-
-test-expensive:
-	cargo test -- --ignored
-.PHONY: test-expensive
-
-test-all: test test-expensive test-cli
-.PHONY: test-all
-
-test-cli: test-cli-ls
-
-test-cli-ls:
-	cargo run --bin select -- ls ./data_access/data/links.rec
-.PHONY: test-cli-ls
-
-clippy:
-	cargo clippy --all --all-features --tests -- -D warnings
-.PHONY: clippy
-
-doc:
-	cargo doc --all-features
-.PHONY: doc
-
-all: format clippy test doc
-
-start-stubs:
-	cargo build --release --package stubs
-	./target/release/stubs -p 8181 ./downloader/tests/http-stubs &
-
-stop-stubs:
-	pkill -f "stubs -p 8181" || true
-
-build:
-	cargo build
-.PHONY: build
-
-build-release:
-	cargo build --release
-.PHONY: build-release
-
-LC:=cargo run --release --bin lc --
-PRO:=--environment pro
-
-import: build-release
-	@if [ -z "$(hn)" ]; then echo "`hn` is not set. use make ... hn=..."; exit 1; fi
-	$(LC) $(PRO) new-record import:$(hn)
-.PHONY: import
-
-add: build-release
-	$(LC) $(PRO) new-record
-.PHONY: add
-
-sync:
-	make -C ~/Documents/project/link-collection sync
-.PHONY: sync
+help: ## Show this help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+.PHONY: help
