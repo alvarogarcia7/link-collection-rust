@@ -1,0 +1,32 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Verify makefile structure
+        run: make help
+
+      - name: Check code formatting
+        run: make format-check
+
+      - name: Run clippy linter
+        run: make clippy
+
+      - name: Run tests
+        run: make test
+
+      - name: Generate documentation
+        run: make doc
