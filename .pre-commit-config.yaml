@@ -1,0 +1,44 @@
+default_stages: [pre-commit]
+
+repos:
+  - repo: local
+    hooks:
+      # Pre-commit stage: Format check
+      - id: cargo-format
+        name: Cargo format check
+        entry: cargo fmt --all -- --check
+        language: system
+        files: '\.rs$'
+        stages: [pre-commit]
+        pass_filenames: false
+        description: Check Rust code formatting with cargo fmt
+
+      # Pre-push stage: Linting
+      - id: cargo-clippy
+        name: Cargo clippy
+        entry: cargo clippy --all --all-features --tests -- -D warnings
+        language: system
+        files: '\.rs$'
+        stages: [pre-push]
+        pass_filenames: false
+        description: Run clippy linter to catch common mistakes and improve code quality
+
+      # Pre-push stage: Tests
+      - id: cargo-test
+        name: Cargo test
+        entry: bash -c 'make start-stubs && cargo test --all --all-features --tests; make stop-stubs'
+        language: system
+        files: '\.rs$'
+        stages: [pre-push]
+        pass_filenames: false
+        description: Run unit and integration tests
+
+      # Pre-push stage: Documentation
+      - id: cargo-doc
+        name: Cargo doc
+        entry: cargo doc --all-features
+        language: system
+        files: '\.rs$'
+        stages: [pre-push]
+        pass_filenames: false
+        description: Generate documentation and check for doc errors
