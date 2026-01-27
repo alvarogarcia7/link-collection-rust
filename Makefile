@@ -3,6 +3,7 @@ include makefiles/rust.mk
 include makefiles/clippy.mk
 include makefiles/test.mk
 include makefiles/app.mk
+include makefiles/meta.mk
 
 all: format clippy test doc ## Run all quality checks (format, clippy, test, doc)
 .PHONY: all
