@@ -15,11 +15,20 @@ install-githooks: $(PREK) ## Install git hooks with Prek
 	$(PREK) install
 .PHONY: install-githooks
 
-init: install-prek install-githooks format-check test ## Initialize this project in this folder (or git worktree) after clone
+init: \
+	install-prek \
+	install-githooks \
+	format-check \
+	test ## Initialize this project in this folder (or git worktree) after clone
 .PHONY: init
 
 # Verification targets for essential goals
-verify-essential-targets: verify-build verify-init verify-test verify-format verify-lint ## Verify all essential targets exist
+verify-essential-targets: \
+	verify-build \
+	verify-init \
+	verify-test \
+	verify-format \
+	verify-lint ## Verify all essential targets exist
 .PHONY: verify-essential-targets
 
 verify-build: ## Verify build target exists
