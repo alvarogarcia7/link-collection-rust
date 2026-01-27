@@ -1,13 +1,21 @@
 # Meta targets for project setup and verification
 
-install-githooks: ## Install git hooks with Prek
-	prek install
+PREK_INSTALL_DIR ?= $(HOME)/.local/bin
+PREK := $(PREK_INSTALL_DIR)/prek
+
+$(PREK): ## Install Prek locally if not already installed
+	cargo install --locked --root $(HOME)/.local prek
+.PHONY: $(PREK)
+
+install-prek: $(PREK) ## Install Prek locally in ~/.local/bin
+	@echo "Prek installed at $(PREK)"
+.PHONY: install-prek
+
+install-githooks: $(PREK) ## Install git hooks with Prek
+	$(PREK) install
 .PHONY: install-githooks
 
-init: ## Initialize this project in this folder (or git worktree) after clone
-	${MAKE} install-githooks
-	${MAKE} format-check
-	${MAKE} test
+init: install-prek install-githooks format-check test ## Initialize this project in this folder (or git worktree) after clone
 .PHONY: init
 
 # Verification targets for essential goals
