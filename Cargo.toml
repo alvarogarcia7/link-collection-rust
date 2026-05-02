@@ -6,7 +6,8 @@ members = [
     , "infra"
     , "app"
     , "downloader"
-    , "stubs"]
+    , "stubs"
+    , "nats-listener"]
 
 [workspace.dependencies]
 log = "0.4.21"
