@@ -1,7 +1,6 @@
 /// NATS client for subscribing to messages.20.hn topic
 use crate::error::{ListenerError, Result};
 use log::{debug, info};
-use std::time::Duration;
 
 /// NATS client configuration
 #[derive(Debug, Clone)]
@@ -71,21 +70,19 @@ impl NatsClient {
 
         // Create connection options
         let mut options = nats::Options::new();
-        options = options.connect_timeout(Duration::from_secs(2));
 
         // Add TLS if configured
         if let (Some(cert), Some(key), Some(ca)) = (config.cert_path, config.key_path, config.ca_path) {
             debug!("Using TLS with certificates: cert={}, key={}, ca={}", cert, key, ca);
             options = options
-                .client_cert(&cert)
-                .client_key(&key)
-                .root_ca(&ca);
+                .client_cert(&cert, &key)
+                .add_root_certificate(&ca);
         }
 
         // Connect to NATS
         let connection = options
             .connect(&config.url)
-            .map_err(|e| ListenerError::ConnectionError(format!("Failed to connect: {}", e)))?;
+            .map_err(|e| ListenerError::ConnectionError(format!("Failed to connect: {:?}", e)))?;
 
         info!("✓ Connected to NATS");
 

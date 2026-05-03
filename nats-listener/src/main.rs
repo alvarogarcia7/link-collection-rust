@@ -7,7 +7,7 @@
 /// - CERTS_DIR: Directory containing TLS certificates (for mTLS)
 
 use nats_listener::{NatsClient, NatsConfig, MessageHandler};
-use log::{info, error};
+use log::info;
 use std::env;
 use clap::Parser;
 

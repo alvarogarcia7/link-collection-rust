@@ -11,6 +11,6 @@ pub mod client;
 pub use message::{HackerNewsMessage, Link};
 pub use error::ListenerError;
 pub use handler::MessageHandler;
-pub use client::NatsClient;
+pub use client::{NatsClient, NatsConfig};
 
 pub type Result<T> = std::result::Result<T, ListenerError>;

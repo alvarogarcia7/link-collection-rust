@@ -18,9 +18,6 @@ pub enum ListenerError {
     #[error("JSON error: {0}")]
     JsonError(#[from] serde_json::Error),
 
-    #[error("IO error: {0}")]
-    IoError(#[from] std::io::Error),
-
     #[error("Configuration error: {0}")]
     ConfigError(String),
 
@@ -29,12 +26,9 @@ pub enum ListenerError {
 
     #[error("Channel error: {0}")]
     ChannelError(String),
-}
 
-impl From<nats::Error> for ListenerError {
-    fn from(err: nats::Error) -> Self {
-        ListenerError::ConnectionError(err.to_string())
-    }
+    #[error("IO error: {0}")]
+    IoError(#[from] std::io::Error),
 }
 
 pub type Result<T> = std::result::Result<T, ListenerError>;

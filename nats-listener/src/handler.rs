@@ -157,7 +157,8 @@ mod tests {
         let result = handler.handle_message(&json);
 
         assert!(result.is_err());
-        assert_eq!(handler.stats.validation_errors, 1);
+        // The message fails deserialization because note.id is required, not validation
+        assert_eq!(handler.stats.decode_errors, 1);
     }
 
     #[test]
