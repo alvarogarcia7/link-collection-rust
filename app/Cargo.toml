@@ -4,19 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.5.7", features = ["derive"] }
-rrecutils = { git = "https://github.com/aisamanra/rrecutils.git", version = "0.1.0" }
+clap = { version = "=4.6.1", features = ["derive"] }
+rrecutils = { git = "https://github.com/aisamanra/rrecutils.git", version = "=0.1.0" }
 domain = { path = "../domain" }
 data_access = { path = "../data_access" }
-rustache = "0.1.0"
+rustache = "=0.1.0"
 infra = { path = "../infra" }
 downloader = { path = "../downloader" }
 log = { workspace = true }
 env_logger = { workspace = true }
-toml = "0.8"
-serde = { version = "1.0", features = ["derive"] }
-dirs = "5.0"
-dotenvy = "0.15"
+toml = "=1.1.2"
+serde = { version = "=1.0.228", features = ["derive"] }
+dirs = "=6.0.0"
+dotenvy = "=0.15.7"
 
 [dev-dependencies]
-tempfile = "3.8"
+tempfile = "=3.27.0"

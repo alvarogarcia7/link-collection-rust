@@ -4,15 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-chrono = "0.4.38"
+chrono = "=0.4.44"
 domain = { path = "../domain" }
-mockall = "0.12.1"
-rustyline = "14.0.0"
+mockall = "=0.14.0"
+rustyline = "=18.0.0"
 downloader = { path = "../downloader" }
 log = { workspace = true }
 
 [dependencies.uuid]
-version = "1.8.0"
+version = "=1.23.1"
 features = [
     "v4",                # Lets you generate random UUIDs
     "fast-rng",          # Use a faster (but still sufficiently random) RNG
