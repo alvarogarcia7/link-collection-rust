@@ -17,12 +17,15 @@ fn test_parse_hackernews_message() {
         "source": "hn"
     }"#;
 
-    let message: HackerNewsMessage = serde_json::from_str(json_str)
-        .expect("Failed to parse message");
+    let message: HackerNewsMessage =
+        serde_json::from_str(json_str).expect("Failed to parse message");
 
     assert_eq!(message.id, "550e8400-e29b-41d4-a716-446655440000");
     assert_eq!(message.note.id, "37962234");
-    assert_eq!(message.note.title, "Ask HN: Recommendations for learning Rust?");
+    assert_eq!(
+        message.note.title,
+        "Ask HN: Recommendations for learning Rust?"
+    );
     assert!(message.validate());
 }
 
@@ -139,7 +142,10 @@ fn test_message_with_all_fields() {
     assert_eq!(message.message_type, "hackernews");
 
     let link = message.to_link();
-    assert_eq!(link.description, Some("I built this cool thing in Rust".to_string()));
+    assert_eq!(
+        link.description,
+        Some("I built this cool thing in Rust".to_string())
+    );
 }
 
 #[test]

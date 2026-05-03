@@ -34,8 +34,7 @@ impl NatsConfig {
 
     /// Load from environment variables
     pub fn from_env() -> Result<Self> {
-        let url = std::env::var("NATS_URL")
-            .unwrap_or_else(|_| "tls://localhost:4222".to_string());
+        let url = std::env::var("NATS_URL").unwrap_or_else(|_| "tls://localhost:4222".to_string());
         let topic = "messages.20.hn".to_string();
         let cert_path = std::env::var("CERTS_DIR")
             .ok()
@@ -59,6 +58,7 @@ impl NatsConfig {
 
 /// NATS client wrapper
 pub struct NatsClient {
+    #[allow(deprecated)]
     connection: nats::Connection,
     topic: String,
 }
@@ -72,11 +72,14 @@ impl NatsClient {
         let mut options = nats::Options::new();
 
         // Add TLS if configured
-        if let (Some(cert), Some(key), Some(ca)) = (config.cert_path, config.key_path, config.ca_path) {
-            debug!("Using TLS with certificates: cert={}, key={}, ca={}", cert, key, ca);
-            options = options
-                .client_cert(&cert, &key)
-                .add_root_certificate(&ca);
+        if let (Some(cert), Some(key), Some(ca)) =
+            (config.cert_path, config.key_path, config.ca_path)
+        {
+            debug!(
+                "Using TLS with certificates: cert={}, key={}, ca={}",
+                cert, key, ca
+            );
+            options = options.client_cert(&cert, &key).add_root_certificate(&ca);
         }
 
         // Connect to NATS
@@ -99,7 +102,9 @@ impl NatsClient {
     {
         info!("Subscribing to topic: {}", self.topic);
 
-        let subscriber = self.connection.subscribe(&self.topic)
+        let subscriber = self
+            .connection
+            .subscribe(&self.topic)
             .map_err(|e| ListenerError::ConnectionError(format!("Subscribe failed: {}", e)))?;
 
         info!("✓ Subscribed to {}", self.topic);

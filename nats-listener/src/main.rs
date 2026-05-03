@@ -1,3 +1,5 @@
+use clap::Parser;
+use log::info;
 /// HackerNews NATS Listener
 ///
 /// Subscribes to messages.20.hn topic and processes HackerNews link entries.
@@ -5,11 +7,8 @@
 /// Environment variables:
 /// - NATS_URL: NATS server URL (default: tls://localhost:4222)
 /// - CERTS_DIR: Directory containing TLS certificates (for mTLS)
-
-use nats_listener::{NatsClient, NatsConfig, MessageHandler};
-use log::info;
+use nats_listener::{MessageHandler, NatsClient, NatsConfig};
 use std::env;
-use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[command(name = "HackerNews NATS Listener")]
