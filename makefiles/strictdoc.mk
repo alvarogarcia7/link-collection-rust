@@ -1,15 +1,17 @@
-.PHONY: strictdoc-install strictdoc-validate strictdoc-build strictdoc-clean strictdoc
+.PHONY: strictdoc-install
+.PHONY: strictdoc-validate
+.PHONY: strictdoc-build
+.PHONY: strictdoc-clean
+.PHONY: strictdoc-view
+.PHONY: strictdoc
 
-# Variables
 STRICTDOC_VERSION ?= latest
 STRICTDOC_EXPORT_DIR ?= build/strictdoc
-# Move requirements to a separate directory for better organization: `requirements`
 STRICTDOC_REQUIREMENTS_DIR ?= .
 
 # Check if strictdoc is installed
 STRICTDOC := $(shell command -v strictdoc 2>/dev/null)
 
-# TODO: manage with uv, not pip
 strictdoc-install: ## Install StrictDoc (requires Python 3.9+)
 	@if command -v strictdoc >/dev/null 2>&1; then \
 		echo "✓ StrictDoc is already installed"; \
@@ -24,7 +26,6 @@ strictdoc-validate: ## Validate StrictDoc requirements syntax
 		echo "❌ StrictDoc not installed. Run 'make strictdoc-install'"; \
 		exit 1; \
 	fi
-	# Move this check to another goal, so we can reuse it.
 	@echo "Validating StrictDoc requirements..."
 	@mkdir -p /tmp/strictdoc-validate
 	@strictdoc export $(STRICTDOC_REQUIREMENTS_DIR) \
@@ -44,7 +45,6 @@ strictdoc-build: ## Build StrictDoc HTML documentation
 		--output-dir $(STRICTDOC_EXPORT_DIR) \
 		&& echo "✓ Documentation built to $(STRICTDOC_EXPORT_DIR)" \
 		|| (echo "❌ Build failed"; exit 1)
-	# Let it fail, do not hide errors
 
 strictdoc-view: ## Open StrictDoc documentation in browser (macOS/Linux)
 	@if [ ! -d "$(STRICTDOC_EXPORT_DIR)" ]; then \
@@ -65,4 +65,3 @@ strictdoc-clean: ## Clean StrictDoc build artifacts
 	@echo "✓ Cleaned"
 
 strictdoc: strictdoc-validate strictdoc-build ## Validate and build StrictDoc documentation
-# One PHONY per line
