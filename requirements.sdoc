@@ -1,0 +1,293 @@
+Document: Requirements Specification
+Title: Link Collection Rust - Requirements
+Version: 1.0
+
+SECTION: System Requirements
+
+REQUIREMENT: SYSREQ-001
+Title: Read existing database files
+Statement: |-
+  The system shall support reading and processing existing database files
+  to retrieve link collection data.
+Status: Active
+
+REQUIREMENT: SYSREQ-002
+Title: Create a CLI application
+Statement: |-
+  The system shall provide a command-line interface with top-level commands
+  and multiple subcommands for managing link collections.
+Status: Active
+
+REQUIREMENT: SYSREQ-003
+Title: Add a new record to the database
+Statement: |-
+  The system shall allow users to add new records to the database through
+  the CLI and temporary file uploads.
+Status: Active
+
+REQUIREMENT: SYSREQ-004
+Title: Retrieve items from database
+Statement: |-
+  The system shall support retrieval and querying of items from the database.
+Status: Active
+
+REQUIREMENT: SYSREQ-005
+Title: Download items from HackerNews
+Statement: |-
+  The system shall download link items from HackerNews and persist them
+  to the database with publication date metadata.
+Status: Active
+
+REQUIREMENT: SYSREQ-006
+Title: Create a wrapper on top of recutils library
+Statement: |-
+  The system shall provide a wrapper abstraction over the recutils library
+  for database operations.
+Status: Active
+
+REQUIREMENT: SYSREQ-007
+Title: Replace Go Stubs with Rust Stubs
+Statement: |-
+  The system shall migrate from Go-based stub implementations to pure Rust
+  stub implementations for all external dependencies.
+Status: Active
+
+SECTION: High-Level Requirements
+
+REQUIREMENT: HLR-001-1
+Title: Dump the contents into the console
+Statement: |-
+  The system shall be able to read database files and output their contents
+  to the console for inspection and debugging.
+ParentReq: SYSREQ-001
+Status: Approved
+
+REQUIREMENT: HLR-001-2
+Title: Use a fixed template to print to console
+Statement: |-
+  The system shall support printing database contents using a predefined
+  template format for consistent output.
+ParentReq: SYSREQ-001
+Status: Approved
+
+REQUIREMENT: HLR-001-3
+Title: Use any template to print to console
+Statement: |-
+  The system shall allow users to specify custom templates for printing
+  database contents to the console.
+ParentReq: SYSREQ-001
+Status: Approved
+
+REQUIREMENT: HLR-001-4
+Title: Read the existing date formats
+Statement: |-
+  The system shall parse and handle multiple date formats present in
+  existing database files.
+ParentReq: SYSREQ-001
+Status: Approved
+
+REQUIREMENT: HLR-001-5
+Title: Add the optional field 'Link'
+Statement: |-
+  The system shall support reading and processing the optional 'Link'
+  field from database records.
+ParentReq: SYSREQ-001
+Status: Approved
+
+REQUIREMENT: HLR-006-1
+Title: Use clap for top command and multiple subcommands
+Statement: |-
+  The system shall use the clap crate for command-line argument parsing
+  to support hierarchical commands and subcommands.
+ParentReq: SYSREQ-002
+Status: Approved
+
+REQUIREMENT: HLR-006-2
+Title: Add a logger
+Statement: |-
+  The system shall include logging functionality for debugging and tracing
+  application execution.
+ParentReq: SYSREQ-002
+Status: Approved
+
+REQUIREMENT: HLR-006-3
+Title: Add a configuration system
+Statement: |-
+  The system shall provide configuration management to avoid repeating
+  hardcoded values throughout the application.
+ParentReq: SYSREQ-002
+Status: Approved
+
+REQUIREMENT: HLR-006-4
+Title: Read the configuration from a file
+Statement: |-
+  The system shall read configuration values from TOML files with support
+  for multiple sources and priority levels.
+ParentReq: SYSREQ-002
+Status: Approved
+
+REQUIREMENT: HLR-006-5
+Title: List the tags from the database
+Statement: |-
+  The system shall provide a command to list all tags present in the
+  database with counts and metadata.
+ParentReq: SYSREQ-002
+Status: Approved
+
+REQUIREMENT: HLR-002-1
+Title: Add record from the CLI
+Statement: |-
+  The system shall allow users to add new records to the database through
+  command-line interface input.
+ParentReq: SYSREQ-003
+Status: Approved
+
+REQUIREMENT: HLR-002-2
+Title: Add record from a temporary file
+Statement: |-
+  The system shall allow users to add new records to the database from
+  temporary file uploads.
+ParentReq: SYSREQ-003
+Status: Approved
+
+REQUIREMENT: HLR-002-3
+Title: Print the record in the same order as it was provided
+Statement: |-
+  The system shall maintain and respect the original field order when
+  printing records that were added to the database.
+ParentReq: SYSREQ-003
+Status: Approved
+
+REQUIREMENT: HLR-004-1
+Title: Create a new stubbed HTTP server
+Statement: |-
+  The system shall include a stubbed HTTP server for testing HackerNews
+  download functionality.
+ParentReq: SYSREQ-005
+Status: Approved
+
+REQUIREMENT: HLR-004-2
+Title: Download the items from a URL
+Statement: |-
+  The system shall fetch link items from a given HackerNews URL endpoint
+  and parse the response.
+ParentReq: SYSREQ-005
+Status: Approved
+
+REQUIREMENT: HLR-004-3
+Title: Commit to git using the date of publishing
+Statement: |-
+  The system shall create git commits for downloaded HackerNews items
+  using their original publication date as the commit date.
+ParentReq: SYSREQ-005
+Status: Approved
+
+REQUIREMENT: HLR-007-1
+Title: Create Rust Stubs for existing Go Stubs
+Statement: |-
+  The system shall replace all Go stub implementations with equivalent
+  Rust implementations without changing external behavior.
+ParentReq: SYSREQ-007
+Status: Approved
+
+SECTION: Low-Level Requirements - Configuration Management
+
+REQUIREMENT: LLR-006-4-1
+Title: Configuration file in TOML format
+Statement: |-
+  Configuration files shall use TOML format for human readability and
+  structured data representation.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-2
+Title: Read config from user home directory
+Statement: |-
+  The system shall read configuration from ~/.config/lc/config.toml
+  as the default configuration location.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-3
+Title: Read config from .env.local file
+Statement: |-
+  The system shall support overriding configuration values from a
+  .env.local file in the current working directory.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-4
+Title: Read config from environment variable
+Statement: |-
+  The system shall support overriding configuration via LC_CONFIG_FILE
+  environment variable.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-5
+Title: Read config from command line argument
+Statement: |-
+  The system shall support overriding configuration via --config-file
+  command-line argument.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-6
+Title: Configuration contains database_file
+Statement: |-
+  Configuration shall include database_file field specifying the path
+  to the database file.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-7
+Title: Configuration contains log_level
+Statement: |-
+  Configuration shall include log_level field specifying the logging level.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-8
+Title: Configuration contains template_file
+Statement: |-
+  Configuration shall include template_file field specifying the path
+  to the output template file.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-9
+Title: Configuration contains hacker_news_url
+Statement: |-
+  Configuration shall include hacker_news_url field specifying the URL
+  for HackerNews item downloads.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-10
+Title: Create struct to hold configuration values
+Statement: |-
+  A struct shall be created to hold all configuration values with proper
+  type definitions and defaults.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-11
+Title: Implement configuration file merging
+Statement: |-
+  The system shall merge configuration values from multiple sources
+  respecting priority order.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-12
+Title: Include configuration in logging setup
+Statement: |-
+  The logger shall be configured using the log_level from configuration.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-13
+Title: Include configuration in database connection
+Statement: |-
+  Database connection logic shall use the database_file from configuration.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-14
+Title: Include configuration in template rendering
+Statement: |-
+  Template rendering logic shall use the template_file from configuration.
+ParentReq: HLR-006-4
+
+REQUIREMENT: LLR-006-4-15
+Title: Include configuration in HackerNews download
+Statement: |-
+  HackerNews download logic shall use the hacker_news_url from configuration.
+ParentReq: HLR-006-4
