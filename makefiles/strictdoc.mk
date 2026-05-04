@@ -7,7 +7,7 @@
 
 STRICTDOC_VERSION ?= latest
 STRICTDOC_EXPORT_DIR ?= build/strictdoc
-STRICTDOC_REQUIREMENTS_DIR ?= .
+STRICTDOC_REQUIREMENTS_DIR ?= requirements
 
 # Check if strictdoc is installed
 STRICTDOC := $(shell command -v strictdoc 2>/dev/null)

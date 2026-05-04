@@ -1,0 +1,151 @@
+[DOCUMENT]
+TITLE: Link Collection Rust - Low-Level Requirements
+VERSION: 1.0
+
+[SECTION]
+TITLE: Low-Level Requirements
+
+[REQUIREMENT]
+UID: LLR-006-4-1
+TITLE: Configuration file in TOML format
+STATEMENT:
+  Configuration files shall use TOML format for human readability and
+  structured data representation.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-2
+TITLE: Read config from user home directory
+STATEMENT:
+  The system shall read configuration from ~/.config/lc/config.toml
+  as the default configuration location.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-3
+TITLE: Read config from .env.local file
+STATEMENT:
+  The system shall support overriding configuration values from a
+  .env.local file in the current working directory.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-4
+TITLE: Read config from environment variable
+STATEMENT:
+  The system shall support overriding configuration via LC_CONFIG_FILE
+  environment variable.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-5
+TITLE: Read config from command line argument
+STATEMENT:
+  The system shall support overriding configuration via --config-file
+  command-line argument.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-6
+TITLE: Configuration contains database_file
+STATEMENT:
+  Configuration shall include database_file field specifying the path
+  to the database file.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-7
+TITLE: Configuration contains log_level
+STATEMENT:
+  Configuration shall include log_level field specifying the logging level.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-8
+TITLE: Configuration contains template_file
+STATEMENT:
+  Configuration shall include template_file field specifying the path
+  to the output template file.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-9
+TITLE: Configuration contains hacker_news_url
+STATEMENT:
+  Configuration shall include hacker_news_url field specifying the URL
+  for HackerNews item downloads.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-10
+TITLE: Create struct to hold configuration values
+STATEMENT:
+  A struct shall be created to hold all configuration values with proper
+  type definitions and defaults.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-11
+TITLE: Implement configuration file merging
+STATEMENT:
+  The system shall merge configuration values from multiple sources
+  respecting priority order.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-12
+TITLE: Include configuration in logging setup
+STATEMENT:
+  The logger shall be configured using the log_level from configuration.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-13
+TITLE: Include configuration in database connection
+STATEMENT:
+  Database connection logic shall use the database_file from configuration.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-14
+TITLE: Include configuration in template rendering
+STATEMENT:
+  Template rendering logic shall use the template_file from configuration.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
+
+[REQUIREMENT]
+UID: LLR-006-4-15
+TITLE: Include configuration in HackerNews download
+STATEMENT:
+  HackerNews download logic shall use the hacker_news_url from configuration.
+RELATIONS:
+- TYPE: ParentReq
+  VALUE: HLR-006-4
