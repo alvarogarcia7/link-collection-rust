@@ -1,8 +1,9 @@
-Document: Requirements Specification
+[DOCUMENT]
 Title: Link Collection Rust - Requirements
 Version: 1.0
 
-SECTION: System Requirements
+[SECTION]
+Title: System Requirements
 
 REQUIREMENT: SYSREQ-001
 Title: Read existing database files
@@ -52,7 +53,8 @@ Statement: |-
   stub implementations for all external dependencies.
 Status: Active
 
-SECTION: High-Level Requirements
+[SECTION]
+Title:High-Level Requirements
 
 REQUIREMENT: HLR-001-1
 Title: Dump the contents into the console
@@ -190,7 +192,8 @@ Statement: |-
 ParentReq: SYSREQ-007
 Status: Approved
 
-SECTION: Low-Level Requirements - Configuration Management
+[SECTION]
+Title:Low-Level Requirements - Configuration Management
 
 REQUIREMENT: LLR-006-4-1
 Title: Configuration file in TOML format
