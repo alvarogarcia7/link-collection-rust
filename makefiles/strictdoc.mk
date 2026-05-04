@@ -8,9 +8,10 @@
 STRICTDOC_VERSION ?= latest
 STRICTDOC_EXPORT_DIR ?= build/strictdoc
 STRICTDOC_REQUIREMENTS_DIR ?= requirements
+STRICTDOC_COMMAND := uv run strictdoc
 
 # Check if strictdoc is installed
-STRICTDOC := $(shell command -v strictdoc 2>/dev/null)
+STRICTDOC := $(shell command -v ${STRICTDOC_COMMAND} 2>/dev/null)
 
 strictdoc-install: ## Install StrictDoc (requires Python 3.9+)
 	@if command -v strictdoc >/dev/null 2>&1; then \
@@ -28,10 +29,8 @@ strictdoc-validate: ## Validate StrictDoc requirements syntax
 	fi
 	@echo "Validating StrictDoc requirements..."
 	@mkdir -p /tmp/strictdoc-validate
-	@strictdoc export $(STRICTDOC_REQUIREMENTS_DIR) \
-		--output-dir /tmp/strictdoc-validate \
-		&& echo "✓ All requirements are valid" \
-		|| (echo "❌ Requirements validation failed"; exit 1)
+	${STRICTDOC_COMMAND} export $(STRICTDOC_REQUIREMENTS_DIR) \
+		--output-dir /tmp/strictdoc-validate
 	@rm -rf /tmp/strictdoc-validate
 
 strictdoc-build: ## Build StrictDoc HTML documentation
@@ -41,10 +40,8 @@ strictdoc-build: ## Build StrictDoc HTML documentation
 	fi
 	@echo "Building StrictDoc documentation..."
 	@mkdir -p $(STRICTDOC_EXPORT_DIR)
-	@strictdoc export $(STRICTDOC_REQUIREMENTS_DIR) \
-		--output-dir $(STRICTDOC_EXPORT_DIR) \
-		&& echo "✓ Documentation built to $(STRICTDOC_EXPORT_DIR)" \
-		|| (echo "❌ Build failed"; exit 1)
+	${STRICTDOC_COMMAND} export $(STRICTDOC_REQUIREMENTS_DIR) \
+		--output-dir $(STRICTDOC_EXPORT_DIR)
 
 strictdoc-view: ## Open StrictDoc documentation in browser (macOS/Linux)
 	@if [ ! -d "$(STRICTDOC_EXPORT_DIR)" ]; then \

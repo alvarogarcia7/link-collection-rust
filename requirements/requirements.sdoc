@@ -8,54 +8,41 @@ TITLE: System Requirements
 [REQUIREMENT]
 UID: SYSREQ-001
 TITLE: Read existing database files
-STATEMENT:
-  The system shall support reading and processing existing database files
-  to retrieve link collection data.
+STATEMENT: The system shall support reading and processing existing database files to retrieve link collection data.
 STATUS: Active
 
 [REQUIREMENT]
 UID: SYSREQ-002
 TITLE: Create a CLI application
-STATEMENT:
-  The system shall provide a command-line interface with top-level commands
-  and multiple subcommands for managing link collections.
+STATEMENT: The system shall provide a command-line interface with top-level commands and multiple subcommands for managing link collections.
 STATUS: Active
 
 [REQUIREMENT]
 UID: SYSREQ-003
 TITLE: Add a new record to the database
-STATEMENT:
-  The system shall allow users to add new records to the database through
-  the CLI and temporary file uploads.
+STATEMENT: The system shall allow users to add new records to the database through the CLI and temporary file uploads.
 STATUS: Active
 
 [REQUIREMENT]
 UID: SYSREQ-004
 TITLE: Retrieve items from database
-STATEMENT:
-  The system shall support retrieval and querying of items from the database.
+STATEMENT: The system shall support retrieval and querying of items from the database.
 STATUS: Active
 
 [REQUIREMENT]
 UID: SYSREQ-005
 TITLE: Download items from HackerNews
-STATEMENT:
-  The system shall download link items from HackerNews and persist them
-  to the database with publication date metadata.
+STATEMENT: The system shall download link items from HackerNews and persist them to the database with publication date metadata.
 STATUS: Active
 
 [REQUIREMENT]
 UID: SYSREQ-006
 TITLE: Create a wrapper on top of recutils library
-STATEMENT:
-  The system shall provide a wrapper abstraction over the recutils library
-  for database operations.
+STATEMENT: The system shall provide a wrapper abstraction over the recutils library for database operations.
 STATUS: Active
 
 [REQUIREMENT]
 UID: SYSREQ-007
 TITLE: Replace Go Stubs with Rust Stubs
-STATEMENT:
-  The system shall migrate from Go-based stub implementations to pure Rust
-  stub implementations for all external dependencies.
+STATEMENT: The system shall migrate from Go-based stub implementations to pure Rust stub implementations for all external dependencies.
 STATUS: Active
