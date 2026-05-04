@@ -29,6 +29,11 @@ STATEMENT:
   the CLI and temporary file uploads.
 STATUS: Active
 
+# Split this requirement into multiple high-level requirements for better organization and clarity:
+# - SYSREQ
+# - HLR
+# - LLR
+
 [REQUIREMENT]
 UID: SYSREQ-004
 TITLE: Retrieve items from database
