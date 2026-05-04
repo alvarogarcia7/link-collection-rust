@@ -24,10 +24,11 @@ strictdoc-validate: ## Validate StrictDoc requirements syntax
 	fi
 	@echo "Validating StrictDoc requirements..."
 	@strictdoc export $(STRICTDOC_REQUIREMENTS_DIR) \
-		--output-dir $(STRICTDOC_EXPORT_DIR) \
-		--check-only \
+		--output-dir /tmp/strictdoc-validate \
+		> /dev/null 2>&1 \
 		&& echo "✓ All requirements are valid" \
 		|| (echo "❌ Requirements validation failed"; exit 1)
+	@rm -rf /tmp/strictdoc-validate
 
 strictdoc-build: ## Build StrictDoc HTML documentation
 	@if [ -z "$(STRICTDOC)" ]; then \
