@@ -7,7 +7,7 @@
 
 STRICTDOC_VERSION ?= latest
 STRICTDOC_EXPORT_DIR ?= build/strictdoc
-STRICTDOC_REQUIREMENTS_DIR ?= requirements
+STRICTDOC_REQUIREMENTS_DIR ?= .
 STRICTDOC_COMMAND := uv run strictdoc
 
 # Check if strictdoc is installed
