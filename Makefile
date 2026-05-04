@@ -4,8 +4,9 @@ include makefiles/clippy.mk
 include makefiles/test.mk
 include makefiles/app.mk
 include makefiles/meta.mk
+include makefiles/strictdoc.mk
 
-all: format clippy test doc ## Run all quality checks (format, clippy, test, doc)
+all: format clippy test doc strictdoc-validate ## Run all quality checks (format, clippy, test, doc, strictdoc)
 .PHONY: all
 
 help: ## Show this help message
