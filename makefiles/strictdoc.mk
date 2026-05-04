@@ -23,9 +23,9 @@ strictdoc-validate: ## Validate StrictDoc requirements syntax
 		exit 1; \
 	fi
 	@echo "Validating StrictDoc requirements..."
+	@mkdir -p /tmp/strictdoc-validate
 	@strictdoc export $(STRICTDOC_REQUIREMENTS_DIR) \
 		--output-dir /tmp/strictdoc-validate \
-		> /dev/null 2>&1 \
 		&& echo "✓ All requirements are valid" \
 		|| (echo "❌ Requirements validation failed"; exit 1)
 	@rm -rf /tmp/strictdoc-validate
