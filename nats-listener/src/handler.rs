@@ -1,6 +1,6 @@
 /// Message handler for processing HackerNews messages
 use crate::error::Result;
-use crate::message::HackerNewsMessage;
+use crate::message::{HackerNewsMessage, ParsedHackerNewsMessage};
 use log::{debug, info, warn};
 
 /// Handles incoming HackerNews messages from NATS
@@ -73,6 +73,68 @@ impl MessageHandler {
         if let Some(date) = &link.date {
             debug!("Link date: {}", date);
         }
+
+        Ok(())
+    }
+
+    /// Process a parsed HackerNews message from messages.30.type.hn.10.parsed
+    pub fn handle_parsed_message(&mut self, data: &[u8]) -> Result<()> {
+        self.stats.total_received += 1;
+
+        // Decode the message
+        let message: ParsedHackerNewsMessage = match serde_json::from_slice(data) {
+            Ok(msg) => msg,
+            Err(e) => {
+                warn!("Failed to decode parsed message: {}", e);
+                self.stats.decode_errors += 1;
+                return Err(crate::error::ListenerError::DecodeError(e.to_string()));
+            }
+        };
+
+        // Validate the message
+        if !message.validate() {
+            warn!("Parsed message validation failed: {:?}", message);
+            self.stats.validation_errors += 1;
+            return Err(crate::error::ListenerError::ValidationError(
+                "Invalid message structure".to_string(),
+            ));
+        }
+
+        // Process the parsed message
+        self.process_parsed_message(&message)?;
+        self.stats.successfully_processed += 1;
+
+        Ok(())
+    }
+
+    /// Process a validated parsed message
+    fn process_parsed_message(&self, message: &ParsedHackerNewsMessage) -> Result<()> {
+        debug!("Processing parsed message: {}", message);
+
+        // Extract link from parsed message (includes tags and domain)
+        let link = message.to_link();
+        info!("✓ Received parsed HackerNews link: {}", link);
+
+        // Log link details including tags and domain
+        debug!(
+            "Link details - ID: {}, Title: {}, URL: {}, Domain: {}",
+            link.id,
+            link.title,
+            link.url,
+            link.domain.as_ref().unwrap_or(&"N/A".to_string())
+        );
+
+        if let Some(tags) = &link.tags {
+            info!("✓ Tags: {}", tags.join(", "));
+        }
+
+        if let Some(date) = &link.date {
+            debug!("Link timestamp: {}", date);
+        }
+
+        // In a real implementation, this would store the link
+        // with tags into the link-collection database
+        debug!("Storing link with tags in database...");
 
         Ok(())
     }

@@ -12,6 +12,52 @@ pub struct Link {
     pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domain: Option<String>,
+}
+
+/// Parsed HackerNews message from messages.30.type.hn.10.parsed topic
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ParsedHackerNewsMessage {
+    pub id: String,
+    pub title: String,
+    pub content: String,
+    pub source: String,
+    #[serde(rename = "type")]
+    pub message_type: String,
+    pub timestamp: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_at: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domain: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+}
+
+impl ParsedHackerNewsMessage {
+    /// Validate the message has required fields
+    pub fn validate(&self) -> bool {
+        !self.id.is_empty()
+            && !self.title.is_empty()
+            && self.message_type == "hn"
+    }
+
+    /// Extract link from the parsed message
+    pub fn to_link(&self) -> Link {
+        Link {
+            id: self.id.clone(),
+            title: self.title.clone(),
+            url: self.url.clone().unwrap_or_default(),
+            description: Some(self.content.clone()),
+            date: Some(self.timestamp.clone()),
+            tags: self.tags.clone(),
+            domain: self.domain.clone(),
+        }
+    }
 }
 
 /// Parsed message from messages.20.hn topic
@@ -81,6 +127,17 @@ impl fmt::Display for Link {
             self.id,
             self.title,
             self.url.chars().take(50).collect::<String>()
+        )
+    }
+}
+
+impl fmt::Display for ParsedHackerNewsMessage {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Parsed HN message: {} [{}]",
+            self.title,
+            self.id
         )
     }
 }

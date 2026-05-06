@@ -2,7 +2,10 @@ use clap::Parser;
 use log::info;
 /// HackerNews NATS Listener
 ///
-/// Subscribes to messages.20.hn topic and processes HackerNews link entries.
+/// Subscribes to HackerNews messages and processes link entries.
+/// Supports two formats:
+/// - routed: messages.20.hn (raw routed messages)
+/// - parsed: messages.30.type.hn.10.parsed (parsed with extracted url and tags)
 ///
 /// Environment variables:
 /// - NATS_URL: NATS server URL (default: tls://localhost:4222)
@@ -21,6 +24,10 @@ struct Args {
     /// NATS topic to subscribe to
     #[arg(long, default_value = "messages.20.hn")]
     topic: String,
+
+    /// Message format: "routed" (messages.20.hn) or "parsed" (messages.30.type.hn.10.parsed)
+    #[arg(long, default_value = "routed")]
+    format: String,
 
     /// Directory containing TLS certificates
     #[arg(long)]
@@ -57,9 +64,17 @@ fn main() -> nats_listener::Result<()> {
     // Create message handler
     let mut handler = MessageHandler::new();
     info!("Starting to listen for messages...");
+    info!("Message format: {}", args.format);
 
-    // Subscribe and handle messages
-    client.subscribe(|data| handler.handle_message(data))?;
+    // Subscribe and handle messages based on format
+    match args.format.as_str() {
+        "parsed" => {
+            client.subscribe(|data| handler.handle_parsed_message(data))?;
+        }
+        "routed" | _ => {
+            client.subscribe(|data| handler.handle_message(data))?;
+        }
+    }
 
     Ok(())
 }
