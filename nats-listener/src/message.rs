@@ -105,6 +105,8 @@ impl HackerNewsMessage {
             url: self.note.url.clone().unwrap_or_default(),
             description: self.note.text.clone(),
             date: self.note.date.clone(),
+            tags: None,
+            domain: None,
         }
     }
 }
